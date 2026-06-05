@@ -5,6 +5,7 @@ import CorrectionFlow from './screens/CorrectionFlow'
 import PerWorkerCard from './screens/PerWorkerCard'
 import Confirmation from './screens/Confirmation'
 import Flowchart from './components/Flowchart'
+import HrRequest from './screens/HrRequest'
 
 const PHONE_W = 390
 const PHONE_H = 844
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/corrections" element={<CorrectionFlow />} />
               <Route path="/correction/:workerId" element={<PerWorkerCard />} />
               <Route path="/confirm" element={<Confirmation />} />
+              <Route path="/hr-request" element={<HrRequest />} />
             </Routes>
           </div>
         </div>

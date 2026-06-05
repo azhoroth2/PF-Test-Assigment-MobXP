@@ -28,6 +28,13 @@ const NODES = [
         search: 'demo=empty',
         active: (p, q) => p === '/' && q === 'empty',
       },
+      {
+        label: 'Offline',
+        desc: 'A1 · last sync banner',
+        path: '/',
+        search: 'demo=offline',
+        active: (p, q) => p === '/' && q === 'offline',
+      },
     ],
   },
   {
@@ -46,6 +53,14 @@ const NODES = [
       {
         label: 'Manual review',
         desc: '<85% confidence',
+        path: '/corrections',
+        search: '',
+        active: () => false,
+        info: true,
+      },
+      {
+        label: 'Undo approve',
+        desc: 'D4 · 5s chip',
         path: '/corrections',
         search: '',
         active: () => false,
@@ -87,6 +102,35 @@ const NODES = [
         search: 'demo=dispute',
         active: (p, q) => p.startsWith('/correction/') && q === 'dispute',
       },
+      {
+        label: 'AI unavailable',
+        desc: 'B1 · manual fallback',
+        path: '/correction/1',
+        search: 'demo=ai-unavailable',
+        active: (p, q) => p.startsWith('/correction/') && q === 'ai-unavailable',
+      },
+      {
+        label: 'Full conflict',
+        desc: 'B3 · all signals clash',
+        path: '/correction/3',
+        search: 'demo=full-conflict',
+        active: (p, q) => p.startsWith('/correction/') && q === 'full-conflict',
+      },
+    ],
+  },
+  {
+    id: 'hr-request',
+    label: 'HR Request',
+    meta: 'E3 · bounce-back',
+    match: (p) => p === '/hr-request',
+    substates: [
+      {
+        label: 'Detail needed',
+        desc: 'E3 · HR bounce-back',
+        path: '/hr-request',
+        search: '',
+        active: (p) => p === '/hr-request',
+      },
     ],
   },
   {
@@ -108,6 +152,13 @@ const NODES = [
         path: '/confirm',
         search: 'demo=partial',
         active: (p, q) => p === '/confirm' && q === 'partial',
+      },
+      {
+        label: 'Offline saved',
+        desc: 'A3 · queued for sync',
+        path: '/confirm',
+        search: 'demo=offline',
+        active: (p, q) => p === '/confirm' && q === 'offline',
       },
     ],
   },

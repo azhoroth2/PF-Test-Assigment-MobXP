@@ -3,7 +3,7 @@ import AnomalyChip from '../components/AnomalyChip'
 import StickyActions from '../components/StickyActions'
 import { workers as allWorkers } from '../data/workers'
 
-const STATES = ['default', 'single', 'empty']
+const STATES = ['default', 'single', 'empty', 'offline']
 
 export default function ShiftSummary() {
   const navigate = useNavigate()
@@ -20,7 +20,7 @@ export default function ShiftSummary() {
   const count = workers.length
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, animation: 'screenEnter 220ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
       {/* Header */}
       <div style={{ padding: '28px 20px 0' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
@@ -32,6 +32,24 @@ export default function ShiftSummary() {
       </div>
 
       <div style={{ flex: 1, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* A1 — offline banner */}
+        {demoState === 'offline' && (
+          <div style={{
+            background: 'var(--surface)',
+            borderRadius: 10,
+            padding: '10px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+          }}>
+            <span style={{ fontSize: 15, color: 'var(--text-secondary)' }}>⚠</span>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+              Showing last sync · 16:30. You can still review.
+            </p>
+          </div>
+        )}
+
         {/* Summary band */}
         <div style={{
           background: 'var(--surface)',
@@ -82,11 +100,11 @@ export default function ShiftSummary() {
                   gap: 12,
                 }}
               >
-                <div>
-                  <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {w.name}
                   </p>
-                  <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {w.role} · {w.shift}
                   </p>
                 </div>

@@ -1,4 +1,20 @@
+import { useState } from 'react'
+
 export default function StickyActions({ primary, secondary }) {
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handlePrimary() {
+    if (submitting || primary.disabled) return
+    setSubmitting(true)
+    try {
+      await primary.onClick()
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const primaryDisabled = primary.disabled || submitting
+
   return (
     <div style={{
       marginTop: 'auto',
@@ -26,21 +42,24 @@ export default function StickyActions({ primary, secondary }) {
         </button>
       )}
       <button
-        onClick={primary.onClick}
-        disabled={primary.disabled}
+        onClick={handlePrimary}
+        disabled={primaryDisabled}
+        aria-busy={submitting}
         style={{
           flex: secondary ? 2 : 1,
           height: 56,
           borderRadius: 'var(--radius-btn)',
-          background: primary.disabled ? 'var(--text-muted)' : 'var(--accent)',
+          background: primaryDisabled ? 'var(--text-muted)' : 'var(--accent)',
           color: 'var(--accent-text)',
           fontSize: 16,
           fontWeight: 600,
           border: 'none',
-          opacity: primary.disabled ? 0.6 : 1,
+          opacity: primaryDisabled ? 0.6 : 1,
+          cursor: primaryDisabled ? 'not-allowed' : 'pointer',
+          transition: 'opacity 0.15s ease, transform 100ms cubic-bezier(0.25, 1, 0.5, 1)',
         }}
       >
-        {primary.label}
+        {submitting ? '…' : primary.label}
       </button>
     </div>
   )

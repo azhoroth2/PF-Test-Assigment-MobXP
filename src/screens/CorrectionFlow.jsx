@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AnomalyChip from '../components/AnomalyChip'
 import ConfidenceBar from '../components/ConfidenceBar'
@@ -11,6 +11,12 @@ export default function CorrectionFlow() {
   const navigate = useNavigate()
   const [approved, setApproved] = useState([])
   const [expanded, setExpanded] = useState(false)
+  const [undoState, setUndoState] = useState(null)
+  const undoTimerRef = useRef(null)
+
+  useEffect(() => {
+    return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current) }
+  }, [])
 
   const highConf = workers.filter((w) => w.confidence >= HIGH_THRESHOLD)
   const lowConf = workers.filter((w) => w.confidence < HIGH_THRESHOLD)
@@ -20,16 +26,26 @@ export default function CorrectionFlow() {
 
   function bulkApprove() {
     const ids = pendingHigh.map((w) => w.id)
+    const prevApproved = [...approved]
     const newApproved = [...approved, ...ids]
     setApproved(newApproved)
+    setUndoState({ count: ids.length, prevApproved })
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    undoTimerRef.current = setTimeout(() => setUndoState(null), 5000)
     const stillLow = lowConf.filter((w) => !newApproved.includes(w.id))
     if (stillLow.length === 0) {
       navigate('/confirm', { state: { total: workers.length, submitted: workers.length } })
     }
   }
 
+  function handleUndo() {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    setApproved(undoState.prevApproved)
+    setUndoState(null)
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, animation: 'screenEnter 220ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
       {/* Header */}
       <div style={{ padding: '28px 20px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
@@ -90,7 +106,7 @@ export default function CorrectionFlow() {
             </div>
 
             {expanded && (
-              <div style={{ borderTop: '1px solid var(--border)' }}>
+              <div style={{ borderTop: '1px solid var(--border)', animation: 'fadeSlideDown 200ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
                 {pendingHigh.map((w) => (
                   <div
                     key={w.id}
@@ -105,15 +121,15 @@ export default function CorrectionFlow() {
                       gap: 12,
                     }}
                   >
-                    <div>
-                      <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                    <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                      <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {w.name}
                       </p>
-                      <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {w.role} · suggested {w.suggestedTime}
                       </p>
                     </div>
-                    <div style={{ minWidth: 100 }}>
+                    <div style={{ minWidth: 100, flexShrink: 0 }}>
                       <ConfidenceBar score={w.confidence} />
                     </div>
                   </div>
@@ -132,6 +148,7 @@ export default function CorrectionFlow() {
             display: 'flex',
             alignItems: 'center',
             gap: 10,
+            animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
           }}>
             <span style={{ fontSize: 20, color: 'var(--accent)' }}>✓</span>
             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--accent)' }}>
@@ -170,11 +187,11 @@ export default function CorrectionFlow() {
                     gap: 12,
                   }}
                 >
-                  <div>
-                    <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                    <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {w.name}
                     </p>
-                    <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+                    <p style={{ fontSize: 14, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {w.role} · {w.shift}
                     </p>
                   </div>
@@ -196,6 +213,30 @@ export default function CorrectionFlow() {
           </div>
         )}
       </div>
+
+      {/* D4 — undo chip after bulk approve */}
+      {undoState && (
+        <div style={{ padding: '0 20px 12px', animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
+          <div style={{
+            background: '#e6f9ee',
+            borderRadius: 10,
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <p style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 500 }}>
+              Approved {undoState.count}
+            </p>
+            <button
+              onClick={handleUndo}
+              style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', background: 'none', padding: '4px 8px' }}
+            >
+              Undo
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Bottom actions */}
       {!allDone && (
