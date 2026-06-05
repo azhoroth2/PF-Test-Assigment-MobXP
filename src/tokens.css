@@ -1,0 +1,34 @@
+:root {
+  --bg: #ffffff;
+  --surface: #edf2f7;
+  --text-primary: #000f30;
+  --text-secondary: #476887;
+  --text-muted: #91a4b7;
+  --accent: #00b950;
+  --accent-text: #ffffff;
+  --border: #dce5ef;
+  --shadow-card: rgba(9, 8, 61, 0.08) 0 1px 4px;
+  --radius-btn: 6px;
+  --radius-card: 16px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font);
+  background: #f0f2f5;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+}
