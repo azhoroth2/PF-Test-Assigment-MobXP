@@ -32,7 +32,7 @@ export default function StickyActions({ primary, secondary }) {
             flex: 1,
             height: 56,
             borderRadius: 'var(--radius-btn)',
-            background: '#f1f5f8',
+            background: 'var(--surface)',
             color: 'var(--text-primary)',
             fontSize: 16,
             fontWeight: 600,

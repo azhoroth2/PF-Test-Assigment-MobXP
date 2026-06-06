@@ -110,13 +110,14 @@ const NODES = [
 function HArrow() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', width: 28, flexShrink: 0 }}>
-      <div style={{ flex: 1, height: 1, background: '#dce5ef' }} />
-      <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderLeft: '6px solid #dce5ef' }} />
+      <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderLeft: '6px solid var(--border)' }} />
     </div>
   )
 }
 
-function VConnector({ color }) {
+function VConnector({ active }) {
+  const color = active ? 'var(--accent)' : 'var(--border)'
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: 24, flexShrink: 0 }}>
       <div style={{ width: 1.5, flex: 1, background: color }} />
@@ -163,22 +164,21 @@ export default function Flowchart() {
         const isActiveNode = node.match(currentPath)
         const isVisited = activeNodeIdx > idx
         const isEntryPoint = !!node.entryPoint
-        const connectorColor = isVisited || isActiveNode ? '#00b950' : '#dce5ef'
 
         return (
           <div key={node.id}>
             {idx > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2px 0' }}>
-                <VConnector color={connectorColor} />
+                <VConnector active={isVisited || isActiveNode} />
               </div>
             )}
 
             <div style={{
               border: isActiveNode
-                ? '2px solid #00b950'
+                ? '2px solid var(--accent)'
                 : isEntryPoint
-                ? '1.5px dashed #dce5ef'
-                : '2px solid #dce5ef',
+                ? '1.5px dashed var(--border)'
+                : '2px solid var(--border)',
               borderRadius: 10,
               background: isActiveNode ? 'rgba(0,185,80,0.03)' : 'var(--bg)',
               overflow: 'hidden',
@@ -191,15 +191,15 @@ export default function Flowchart() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                borderBottom: '1px solid #dce5ef',
+                borderBottom: '1px solid var(--border)',
                 background: isActiveNode ? 'rgba(0,185,80,0.03)' : 'var(--surface)',
               }}>
-                <p style={{ fontSize: 14, fontWeight: 700, color: isActiveNode ? '#00b950' : isVisited ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: isActiveNode ? 'var(--accent)' : isVisited ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
                   {node.label}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {isActiveNode && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b950', flexShrink: 0 }} />}
-                  {isVisited && !isActiveNode && <span style={{ fontSize: 13, color: '#00b950', fontWeight: 700 }}>✓</span>}
+                  {isActiveNode && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />}
+                  {isVisited && !isActiveNode && <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 700 }}>✓</span>}
                 </div>
               </div>
 
@@ -227,7 +227,7 @@ export default function Flowchart() {
                               flexShrink: 0,
                               padding: '10px 8px',
                               background: isActiveSub ? 'rgba(0,185,80,0.06)' : 'var(--surface)',
-                              border: `1.5px solid ${isActiveSub ? '#00b950' : '#dce5ef'}`,
+                              border: `1.5px solid ${isActiveSub ? 'var(--accent)' : 'var(--border)'}`,
                               borderRadius: 10,
                               cursor: 'pointer',
                               textAlign: 'center',
@@ -237,7 +237,7 @@ export default function Flowchart() {
                             <p style={{
                               fontSize: 12,
                               fontWeight: isActiveSub ? 700 : 500,
-                              color: isActiveSub ? '#00b950' : 'var(--text-primary)',
+                              color: isActiveSub ? 'var(--accent)' : 'var(--text-primary)',
                               lineHeight: 1.35,
                               marginBottom: 3,
                               wordBreak: 'break-word',

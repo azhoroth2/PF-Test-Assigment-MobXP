@@ -31,7 +31,7 @@ function getDemoState(searchParam, worker) {
 
 function SkeletonBlock() {
   const shimmerStyle = {
-    background: 'linear-gradient(90deg, #edf2f7 25%, #dce5ef 50%, #edf2f7 75%)',
+    background: 'linear-gradient(90deg, var(--surface) 25%, var(--border) 50%, var(--surface) 75%)',
     backgroundSize: '800px 100%',
     animation: 'shimmer 1.4s ease-in-out infinite',
     borderRadius: 4,
@@ -74,13 +74,14 @@ export default function PerWorkerCard() {
     62
 
   const clockInMins = parseClockIn(worker.shift)
+  const aiSuggestedTime = worker.suggestedTime
 
   const [selectedReason, setSelectedReason] = useState(() => getDefaultReason(worker, demoState))
   const [reasonValid, setReasonValid] = useState(() => {
     const r = getDefaultReason(worker, demoState)
     return r !== null && r !== 'Other'
   })
-  const [showStepper, setShowStepper] = useState(() => isAiUnavailable || isTimeBounds)
+  const [showEditCard, setShowEditCard] = useState(() => isAiUnavailable || isTimeBounds)
   const [confirmedTime, setConfirmedTime] = useState(() => isTimeBounds ? '08:05' : worker.suggestedTime)
   const [showReasonHint, setShowReasonHint] = useState(false)
   const [loadingDone, setLoadingDone] = useState(false)
@@ -90,7 +91,7 @@ export default function PerWorkerCard() {
     const r = getDefaultReason(worker, demoState)
     setSelectedReason(r)
     setReasonValid(r !== null && r !== 'Other')
-    setShowStepper(demoState === 'ai-unavailable' || demoState === 'time-bounds')
+    setShowEditCard(demoState === 'ai-unavailable' || demoState === 'time-bounds')
     setConfirmedTime(demoState === 'time-bounds' ? '08:05' : worker.suggestedTime)
     setShowReasonHint(false)
     setLoadingDone(false)
@@ -112,7 +113,8 @@ export default function PerWorkerCard() {
 
   function handleTimeChange(t) {
     setConfirmedTime(t)
-    setSelectedReason('Worker confirmed')
+    setSelectedReason(null)
+    setReasonValid(false)
     setShowReasonHint(false)
   }
 
@@ -131,6 +133,11 @@ export default function PerWorkerCard() {
     navigate('/', { state: { notMineConfirmed: true } })
   }
 
+  function handleResetTime() {
+    setConfirmedTime(aiSuggestedTime)
+    setShowEditCard(false)
+  }
+
   const reasoningText =
     demoState === 'full-conflict'
       ? 'Schedule says 16:00 but clock data and team pattern disagree — confirm with worker.'
@@ -140,7 +147,6 @@ export default function PerWorkerCard() {
 
   const isDispute = demoState === 'dispute' || selectedReason === 'Dispute – follow up'
 
-  // Step counter: when reviewing from batch, show position in low-conf queue
   const from = location.state?.from
   const workerIdx = LOW_CONF.findIndex((w) => w.id === Number(workerId))
   const showStepCounter = from === 'batch' && workerIdx >= 0
@@ -158,7 +164,6 @@ export default function PerWorkerCard() {
             color: 'var(--text-secondary)',
             fontSize: 22,
             lineHeight: 1,
-            
             minHeight: 56,
             display: 'flex',
             alignItems: 'center',
@@ -203,49 +208,93 @@ export default function PerWorkerCard() {
         {/* M4 — skeleton loading */}
         {isLoading && !loadingDone && <SkeletonBlock />}
 
-        {/* AI suggestion block */}
-        {!isLoading && (showAiUnavailable ? (
-          <div style={{
-            background: 'var(--surface)',
-            borderRadius: 'var(--radius-card)',
-            padding: '18px',
-            display: 'flex',
-            gap: 12,
-            alignItems: 'flex-start',
-          }}>
-            <span style={{ fontSize: 20, color: 'var(--text-secondary)', marginTop: 1, flexShrink: 0 }}>⚠</span>
-            <div>
-              <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
-                AI couldn't suggest a time
-              </p>
-              <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                Enter it manually below.
-              </p>
+        {/* AI unavailable: notice + stepper */}
+        {!isLoading && showAiUnavailable && (
+          <>
+            <div style={{
+              background: 'var(--surface)',
+              borderRadius: 'var(--radius-card)',
+              padding: '18px',
+              display: 'flex',
+              gap: 12,
+              alignItems: 'flex-start',
+            }}>
+              <span style={{ fontSize: 20, color: 'var(--text-secondary)', marginTop: 1, flexShrink: 0 }}>⚠</span>
+              <div>
+                <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                  AI couldn't suggest a time
+                </p>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  Enter it manually below.
+                </p>
+              </div>
             </div>
-          </div>
-        ) : !isLoading && (
+            <div style={{
+              background: 'var(--surface)',
+              borderRadius: 'var(--radius-card)',
+              padding: '16px 18px',
+            }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>
+                Adjust clock-out time
+              </p>
+              <TimeStepper
+                value={confirmedTime}
+                onChange={handleTimeChange}
+                minMins={0}
+              />
+            </div>
+          </>
+        )}
+
+        {/* AI suggestion card (with inline Edit time action) */}
+        {!isLoading && !showAiUnavailable && (
           <div style={{
             background: 'var(--bg)',
             border: '1.5px solid var(--border)',
             borderRadius: 'var(--radius-card)',
-            padding: '18px 18px 16px',
             boxShadow: 'var(--shadow-card)',
+            padding: '18px 18px 16px',
           }}>
             <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
               AI suggestion
             </p>
-            <p style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 14 }}>
-              {confirmedTime}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <p style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {aiSuggestedTime}
+              </p>
+              {!showEditCard && !isDispute && (
+                <button
+                  onClick={() => setShowEditCard(true)}
+                  aria-label="Edit time"
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '50%',
+                    background: 'var(--surface)',
+                    border: '1.5px solid var(--border)',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              )}
+            </div>
             <ConfidenceBar score={effectiveConf} />
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 12, lineHeight: 1.5, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
               {reasoningText}
             </p>
           </div>
-        ))}
+        )}
 
-        {/* Time stepper */}
-        {(showStepper || showAiUnavailable) && (
+        {/* Edit time card (visible when user opened editor, AI present) */}
+        {!isLoading && !showAiUnavailable && showEditCard && (
           <div style={{
             background: 'var(--surface)',
             borderRadius: 'var(--radius-card)',
@@ -260,6 +309,25 @@ export default function PerWorkerCard() {
               onChange={handleTimeChange}
               minMins={isTimeBounds ? clockInMins : 0}
             />
+            {confirmedTime !== aiSuggestedTime && (
+              <button
+                onClick={handleResetTime}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  fontSize: 13,
+                  cursor: 'pointer',
+                  padding: '8px 0 2px',
+                  textDecoration: 'underline',
+                  textDecorationColor: 'var(--border)',
+                  textUnderlineOffset: 2,
+                  display: 'block',
+                }}
+              >
+                Reset to suggested
+              </button>
+            )}
           </div>
         )}
 
@@ -267,7 +335,7 @@ export default function PerWorkerCard() {
         {!isLoading && (
           <div>
             <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 12 }}>
-              Why confirming this time?
+              Why this time?
             </p>
             <ReasonPills
               selected={selectedReason}
@@ -294,11 +362,6 @@ export default function PerWorkerCard() {
         secondary={
           isWrongRoster
             ? { label: 'Not mine — send to HR', onClick: handleNotMine }
-            : !isDispute && !showAiUnavailable && !isLoading
-            ? {
-                label: showStepper ? 'Use suggestion' : 'Edit time',
-                onClick: () => setShowStepper((s) => !s),
-              }
             : null
         }
       />

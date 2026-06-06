@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const REASONS = ['Schedule default', 'Worker confirmed', 'Dispute – follow up', 'Other']
+const REASONS = ['Schedule default', 'Dispute – follow up', 'Other']
 
 export default function ReasonPills({ selected, onChange, onValidChange }) {
   const [otherText, setOtherText] = useState('')
@@ -23,35 +23,39 @@ export default function ReasonPills({ selected, onChange, onValidChange }) {
   const showOther = selected === 'Other'
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {REASONS.map((r) => {
-          const isSelected = selected === r
-          return (
-            <button
-              key={r}
-              onClick={() => handleSelect(r)}
-              aria-pressed={isSelected}
-              style={{
-                minHeight: 56,
-                padding: '0 16px',
-                borderRadius: 'var(--radius-btn)',
-                background: isSelected ? '#e6f9ee' : 'var(--surface)',
-                color: isSelected ? 'var(--accent)' : 'var(--text-primary)',
-                border: isSelected ? '2px solid var(--accent)' : '2px solid transparent',
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: 'pointer',
-                transition: 'background 180ms cubic-bezier(0.25, 1, 0.5, 1), border-color 180ms cubic-bezier(0.25, 1, 0.5, 1), color 150ms ease, transform 100ms cubic-bezier(0.25, 1, 0.5, 1)',
-              }}
-            >
-              {r}
-            </button>
-          )
-        })}
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {REASONS.map((r) => {
+        const isSelected = selected === r
+        return (
+          <button
+            key={r}
+            onClick={() => handleSelect(r)}
+            aria-pressed={isSelected}
+            style={{
+              width: '100%',
+              minHeight: 56,
+              padding: '0 16px',
+              borderRadius: 'var(--radius-btn)',
+              background: isSelected ? 'rgba(0,185,80,0.10)' : 'var(--surface)',
+              color: isSelected ? 'var(--accent)' : 'var(--text-primary)',
+              border: isSelected ? '1.5px solid var(--accent)' : '1.5px solid var(--border)',
+              fontSize: 14,
+              fontWeight: isSelected ? 600 : 500,
+              cursor: 'pointer',
+              textAlign: 'left',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              transition: 'background 180ms cubic-bezier(0.25, 1, 0.5, 1), border-color 180ms cubic-bezier(0.25, 1, 0.5, 1), color 150ms ease, transform 100ms cubic-bezier(0.25, 1, 0.5, 1)',
+            }}
+          >
+            <span>{r}</span>
+            {isSelected && <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>✓</span>}
+          </button>
+        )
+      })}
       {showOther && (
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 4 }}>
           <input
             autoFocus
             type="text"

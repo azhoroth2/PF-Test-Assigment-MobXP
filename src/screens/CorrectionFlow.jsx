@@ -203,7 +203,7 @@ export default function CorrectionFlow() {
         {/* Approved high-conf notice */}
         {approved.length > 0 && pendingHigh.length === 0 && highConf.length > 0 && (
           <div style={{
-            background: '#e6f9ee',
+            background: 'rgba(0,185,80,0.08)',
             borderRadius: 'var(--radius-card)',
             padding: '14px 18px',
             display: 'flex',
@@ -257,7 +257,7 @@ export default function CorrectionFlow() {
         )}
 
         {allDone && (
-          <div style={{ background: '#e6f9ee', borderRadius: 'var(--radius-card)', padding: '20px 18px', textAlign: 'center' }}>
+          <div style={{ background: 'rgba(0,185,80,0.08)', borderRadius: 'var(--radius-card)', padding: '20px 18px', textAlign: 'center' }}>
             <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--accent)' }}>All corrections reviewed ✓</p>
           </div>
         )}
@@ -267,7 +267,7 @@ export default function CorrectionFlow() {
       {undoState && (
         <div style={{ padding: '0 20px 12px', animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
           <div style={{
-            background: '#e6f9ee',
+            background: 'rgba(0,185,80,0.08)',
             borderRadius: 10,
             padding: '12px 16px',
             display: 'flex',

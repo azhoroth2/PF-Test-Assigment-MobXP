@@ -15,7 +15,7 @@ export default function Confirmation() {
   const remaining = total - submitted
 
   const icon = isOffline ? '⏳' : isPartialSync ? '↻' : partial ? '⚠' : '✓'
-  const iconBg = (isOffline || partial || isPartialSync) ? 'var(--surface)' : '#e6f9ee'
+  const iconBg = (isOffline || partial || isPartialSync) ? 'var(--surface)' : 'rgba(0,185,80,0.10)'
 
   const headline = isOffline
     ? 'Saved — will send to HR when back online'
