@@ -4,165 +4,126 @@ const NODES = [
   {
     id: 'shift',
     label: 'Shift Summary',
-    meta: 'ForOpens · V2',
     match: (p) => p === '/',
-    substates: [
+    rows: [
       {
-        label: 'Default',
-        desc: '3 flagged',
-        path: '/',
-        search: 'demo=default',
-        active: (p, q) => p === '/' && (!q || q === 'default'),
+        label: null,
+        items: [
+          { label: 'Default', desc: '3 flagged', path: '/', search: 'demo=default', active: (p, q) => p === '/' && (!q || q === 'default') },
+          { label: 'Single', desc: '1 flagged', path: '/', search: 'demo=single', active: (p, q) => p === '/' && q === 'single' },
+          { label: 'Empty', desc: 'All clear', path: '/', search: 'demo=empty', active: (p, q) => p === '/' && q === 'empty' },
+        ],
       },
       {
-        label: 'Single',
-        desc: '1 flagged',
-        path: '/',
-        search: 'demo=single',
-        active: (p, q) => p === '/' && q === 'single',
-      },
-      {
-        label: 'Empty',
-        desc: 'All clear',
-        path: '/',
-        search: 'demo=empty',
-        active: (p, q) => p === '/' && q === 'empty',
-      },
-      {
-        label: 'Offline',
-        desc: 'A1 · last sync banner',
-        path: '/',
-        search: 'demo=offline',
-        active: (p, q) => p === '/' && q === 'offline',
+        label: 'Edge cases',
+        items: [
+          { label: 'Offline', desc: 'A1 · banner', path: '/', search: 'demo=offline', active: (p, q) => p === '/' && q === 'offline' },
+          { label: 'Multi-line', desc: 'Lines A & B', path: '/', search: 'demo=multi-line', active: (p, q) => p === '/' && q === 'multi-line' },
+        ],
       },
     ],
   },
   {
     id: 'corrections',
     label: 'Corrections',
-    meta: 'Batch · V3',
     match: (p) => p === '/corrections',
-    substates: [
+    rows: [
       {
-        label: 'Bulk approve',
-        desc: '≥85% confidence',
-        path: '/corrections',
-        search: '',
-        active: (p) => p === '/corrections',
+        label: null,
+        items: [
+          { label: 'Bulk approve', desc: '≥85% conf', path: '/corrections', search: 'demo=bulk', active: (p, q) => p === '/corrections' && (!q || q === 'bulk') },
+          { label: 'Undo approve', desc: 'D4 · tap Approve', path: '/corrections', search: 'demo=undo', active: (p, q) => p === '/corrections' && q === 'undo' },
+          { label: 'Manual review', desc: '<85% conf', path: '/corrections', search: 'demo=manual', active: (p, q) => p === '/corrections' && q === 'manual' },
+        ],
       },
       {
-        label: 'Manual review',
-        desc: '<85% confidence',
-        path: '/corrections',
-        search: '',
-        active: () => false,
-        info: true,
-      },
-      {
-        label: 'Undo approve',
-        desc: 'D4 · 5s chip',
-        path: '/corrections',
-        search: '',
-        active: () => false,
-        info: true,
+        label: 'Edge cases',
+        items: [
+          { label: 'Offline', desc: 'Mid-flow sync', path: '/corrections', search: 'demo=offline', active: (p, q) => p === '/corrections' && q === 'offline' },
+        ],
       },
     ],
   },
   {
     id: 'worker',
     label: 'Per-Worker',
-    meta: 'D_Conf · V4 V5',
     match: (p) => p.startsWith('/correction/'),
-    substates: [
+    rows: [
       {
-        label: 'High-confidence',
-        desc: '≥90% · auto-hint',
-        path: '/correction/1',
-        search: 'demo=high-confidence',
-        active: (p, q) => p.startsWith('/correction/') && q === 'high-confidence',
+        label: 'Happy path',
+        items: [
+          { label: 'High-conf', desc: '≥90%', path: '/correction/1', search: 'demo=high-confidence', active: (p, q) => p.startsWith('/correction/') && q === 'high-confidence' },
+          { label: 'Low-conf', desc: '60–89%', path: '/correction/1', search: 'demo=low-confidence', active: (p, q) => p.startsWith('/correction/') && q === 'low-confidence' },
+          { label: 'Conflict', desc: 'Signals clash', path: '/correction/3', search: 'demo=conflict', active: (p, q) => p.startsWith('/correction/') && q === 'conflict' },
+          { label: 'Dispute', desc: 'Follow-up', path: '/correction/3', search: 'demo=dispute', active: (p, q) => p.startsWith('/correction/') && q === 'dispute' },
+        ],
       },
       {
-        label: 'Low-confidence',
-        desc: '60–89% · no hint',
-        path: '/correction/1',
-        search: 'demo=low-confidence',
-        active: (p, q) => p.startsWith('/correction/') && q === 'low-confidence',
+        label: 'Edge cases',
+        items: [
+          { label: 'Full conflict', desc: 'B3 · all clash', path: '/correction/3', search: 'demo=full-conflict', active: (p, q) => p.startsWith('/correction/') && q === 'full-conflict' },
+          { label: 'AI unavail.', desc: 'B1 · manual', path: '/correction/1', search: 'demo=ai-unavailable', active: (p, q) => p.startsWith('/correction/') && q === 'ai-unavailable' },
+          { label: 'Loading', desc: 'M4 · skeleton', path: '/correction/1', search: 'demo=loading', active: (p, q) => p.startsWith('/correction/') && q === 'loading' },
+        ],
       },
       {
-        label: 'Conflict',
-        desc: 'Signals disagree',
-        path: '/correction/3',
-        search: 'demo=conflict',
-        active: (p, q) => p.startsWith('/correction/') && (q === 'conflict' || (!q && false)),
-      },
-      {
-        label: 'Dispute',
-        desc: 'Follow-up flag',
-        path: '/correction/3',
-        search: 'demo=dispute',
-        active: (p, q) => p.startsWith('/correction/') && q === 'dispute',
-      },
-      {
-        label: 'AI unavailable',
-        desc: 'B1 · manual fallback',
-        path: '/correction/1',
-        search: 'demo=ai-unavailable',
-        active: (p, q) => p.startsWith('/correction/') && q === 'ai-unavailable',
-      },
-      {
-        label: 'Full conflict',
-        desc: 'B3 · all signals clash',
-        path: '/correction/3',
-        search: 'demo=full-conflict',
-        active: (p, q) => p.startsWith('/correction/') && q === 'full-conflict',
+        label: 'Validation',
+        items: [
+          { label: 'Time bounds', desc: 'M2 · clock-in', path: '/correction/1', search: 'demo=time-bounds', active: (p, q) => p.startsWith('/correction/') && q === 'time-bounds' },
+          { label: 'Wrong roster', desc: 'M9 · not mine', path: '/correction/3', search: 'demo=wrong-roster', active: (p, q) => p.startsWith('/correction/') && q === 'wrong-roster' },
+        ],
       },
     ],
   },
   {
     id: 'hr-request',
     label: 'HR Request',
-    meta: 'E3 · bounce-back',
+    entryPoint: true,
     match: (p) => p === '/hr-request',
-    substates: [
+    rows: [
       {
-        label: 'Detail needed',
-        desc: 'E3 · HR bounce-back',
-        path: '/hr-request',
-        search: '',
-        active: (p) => p === '/hr-request',
+        label: null,
+        items: [
+          { label: 'Detail needed', desc: 'E3 · bounce-back', path: '/hr-request', search: '', active: (p) => p === '/hr-request' },
+        ],
       },
     ],
   },
   {
     id: 'confirm',
     label: 'Confirmation',
-    meta: 'Submit · V6',
     match: (p) => p === '/confirm',
-    substates: [
+    rows: [
       {
-        label: 'Success',
-        desc: 'All submitted',
-        path: '/confirm',
-        search: '',
-        active: (p, q) => p === '/confirm' && q !== 'partial',
-      },
-      {
-        label: 'Partial',
-        desc: 'Some remaining',
-        path: '/confirm',
-        search: 'demo=partial',
-        active: (p, q) => p === '/confirm' && q === 'partial',
-      },
-      {
-        label: 'Offline saved',
-        desc: 'A3 · queued for sync',
-        path: '/confirm',
-        search: 'demo=offline',
-        active: (p, q) => p === '/confirm' && q === 'offline',
+        label: null,
+        items: [
+          { label: 'Success', desc: 'All submitted', path: '/confirm', search: '', active: (p, q) => p === '/confirm' && q !== 'partial' && q !== 'offline' && q !== 'partial-sync' },
+          { label: 'Partial', desc: 'Some remain', path: '/confirm', search: 'demo=partial', active: (p, q) => p === '/confirm' && q === 'partial' },
+          { label: 'Offline saved', desc: 'A3 · queued', path: '/confirm', search: 'demo=offline', active: (p, q) => p === '/confirm' && q === 'offline' },
+          { label: 'Partial sync', desc: 'A5 · pending', path: '/confirm', search: 'demo=partial-sync', active: (p, q) => p === '/confirm' && q === 'partial-sync' },
+        ],
       },
     ],
   },
 ]
+
+function HArrow() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', width: 28, flexShrink: 0 }}>
+      <div style={{ flex: 1, height: 1, background: '#dce5ef' }} />
+      <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderLeft: '6px solid #dce5ef' }} />
+    </div>
+  )
+}
+
+function VConnector({ color }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: 24, flexShrink: 0 }}>
+      <div style={{ width: 1.5, flex: 1, background: color }} />
+      <div style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: `6px solid ${color}` }} />
+    </div>
+  )
+}
 
 export default function Flowchart() {
   const location = useLocation()
@@ -174,8 +135,7 @@ export default function Flowchart() {
   const activeNodeIdx = NODES.findIndex((n) => n.match(currentPath))
 
   function goTo(path, search) {
-    const url = search ? `${path}?${search}` : path
-    navigate(url)
+    navigate(search ? `${path}?${search}` : path)
   }
 
   return (
@@ -183,17 +143,17 @@ export default function Flowchart() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'stretch',
-      width: 196,
+      width: 580,
       paddingTop: 56,
       flexShrink: 0,
     }}>
       <p style={{
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 700,
-        letterSpacing: 1.2,
-        color: 'var(--text-muted)',
+        letterSpacing: 1.4,
+        color: 'var(--text-secondary)',
         textTransform: 'uppercase',
-        marginBottom: 20,
+        marginBottom: 24,
         textAlign: 'center',
       }}>
         Flow
@@ -202,131 +162,98 @@ export default function Flowchart() {
       {NODES.map((node, idx) => {
         const isActiveNode = node.match(currentPath)
         const isVisited = activeNodeIdx > idx
+        const isEntryPoint = !!node.entryPoint
+        const connectorColor = isVisited || isActiveNode ? '#00b950' : '#dce5ef'
 
         return (
           <div key={node.id}>
-            {/* Connector line */}
             {idx > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                {idx === 2 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '88%',
-                    fontSize: 9,
-                    color: 'var(--text-muted)',
-                    fontWeight: 500,
-                    paddingTop: 3,
-                  }}>
-                    <span>Bulk OK</span>
-                    <span>Manual</span>
-                  </div>
-                )}
-                <div style={{
-                  width: 2,
-                  height: idx === 2 ? 14 : 10,
-                  background: isVisited || isActiveNode ? 'var(--accent)' : 'var(--border)',
-                  marginBottom: 0,
-                }} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2px 0' }}>
+                <VConnector color={connectorColor} />
               </div>
             )}
 
-            {/* Main node header */}
             <div style={{
               border: isActiveNode
-                ? '2px solid var(--accent)'
-                : '2px solid var(--border)',
+                ? '2px solid #00b950'
+                : isEntryPoint
+                ? '1.5px dashed #dce5ef'
+                : '2px solid #dce5ef',
               borderRadius: 10,
-              background: isActiveNode ? '#e6f9ee' : 'var(--bg)',
+              background: isActiveNode ? 'rgba(0,185,80,0.03)' : 'var(--bg)',
               overflow: 'hidden',
-              transition: 'all 0.15s ease',
-              boxShadow: isActiveNode ? '0 2px 8px rgba(0,185,80,0.12)' : 'none',
+              transition: 'border-color 180ms cubic-bezier(0.25,1,0.5,1), background 180ms cubic-bezier(0.25,1,0.5,1), box-shadow 180ms cubic-bezier(0.25,1,0.5,1)',
+              boxShadow: isActiveNode ? '0 2px 8px rgba(0,185,80,0.08)' : 'none',
             }}>
-              {/* Node title row */}
+              {/* Phase header */}
               <div style={{
-                padding: '8px 12px 6px',
+                padding: '9px 16px 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                borderBottom: '1px solid var(--border)',
+                borderBottom: '1px solid #dce5ef',
+                background: isActiveNode ? 'rgba(0,185,80,0.03)' : 'var(--surface)',
               }}>
-                <p style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: isActiveNode ? 'var(--accent)' : isVisited ? 'var(--text-secondary)' : 'var(--text-primary)',
-                }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: isActiveNode ? '#00b950' : isVisited ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
                   {node.label}
                 </p>
-                {isActiveNode && (
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />
-                )}
-                {isVisited && !isActiveNode && (
-                  <span style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 700 }}>✓</span>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {isActiveNode && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b950', flexShrink: 0 }} />}
+                  {isVisited && !isActiveNode && <span style={{ fontSize: 13, color: '#00b950', fontWeight: 700 }}>✓</span>}
+                </div>
               </div>
 
-              {/* Substates */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {node.substates.map((sub, sIdx) => {
-                  const isActiveSub = sub.active(currentPath, currentDemo)
-                  const isInfoOnly = sub.info
-
-                  return (
-                    <button
-                      key={sIdx}
-                      onClick={() => !isInfoOnly && goTo(sub.path, sub.search)}
-                      title={isInfoOnly ? sub.desc : `Go to ${sub.label}`}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        padding: '6px 10px',
-                        background: isActiveSub ? 'rgba(0,185,80,0.08)' : 'transparent',
-                        border: 'none',
-                        borderTop: sIdx > 0 ? '1px solid var(--border)' : 'none',
-                        cursor: isInfoOnly ? 'default' : 'pointer',
-                        textAlign: 'left',
-                        width: '100%',
-                        transition: 'background 0.1s',
-                      }}
-                    >
-                      {/* State dot */}
-                      <div style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: isActiveSub
-                          ? 'var(--accent)'
-                          : isInfoOnly
-                          ? 'var(--border)'
-                          : 'var(--text-muted)',
-                        flexShrink: 0,
-                        opacity: isInfoOnly ? 0.5 : 1,
-                      }} />
-                      <div>
-                        <p style={{
-                          fontSize: 11,
-                          fontWeight: isActiveSub ? 600 : 400,
-                          color: isActiveSub
-                            ? 'var(--accent)'
-                            : isInfoOnly
-                            ? 'var(--text-muted)'
-                            : 'var(--text-primary)',
-                          lineHeight: 1.3,
-                        }}>
-                          {sub.label}
-                        </p>
-                        <p style={{
-                          fontSize: 9,
-                          color: 'var(--text-muted)',
-                          lineHeight: 1.3,
-                        }}>
-                          {sub.desc}
-                        </p>
-                      </div>
-                    </button>
-                  )
-                })}
+              {/* Rows */}
+              <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {node.rows.map((row, rIdx) => (
+                  <div key={rIdx}>
+                    {row.label && (
+                      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>
+                        {row.label}
+                      </p>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'stretch' }}>
+                      {row.items.flatMap((item, iIdx) => {
+                        const isActiveSub = item.active(currentPath, currentDemo)
+                        const elements = []
+                        if (iIdx > 0) elements.push(<HArrow key={`a-${rIdx}-${iIdx}`} />)
+                        elements.push(
+                          <button
+                            key={`n-${rIdx}-${iIdx}`}
+                            onClick={() => goTo(item.path, item.search)}
+                            title={`Go to ${item.label}`}
+                            style={{
+                              width: 112,
+                              flexShrink: 0,
+                              padding: '10px 8px',
+                              background: isActiveSub ? 'rgba(0,185,80,0.06)' : 'var(--surface)',
+                              border: `1.5px solid ${isActiveSub ? '#00b950' : '#dce5ef'}`,
+                              borderRadius: 10,
+                              cursor: 'pointer',
+                              textAlign: 'center',
+                              transition: 'background 150ms cubic-bezier(0.25,1,0.5,1), border-color 150ms cubic-bezier(0.25,1,0.5,1), transform 100ms cubic-bezier(0.25,1,0.5,1)',
+                            }}
+                          >
+                            <p style={{
+                              fontSize: 12,
+                              fontWeight: isActiveSub ? 700 : 500,
+                              color: isActiveSub ? '#00b950' : 'var(--text-primary)',
+                              lineHeight: 1.35,
+                              marginBottom: 3,
+                              wordBreak: 'break-word',
+                            }}>
+                              {item.label}
+                            </p>
+                            <p style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                              {item.desc}
+                            </p>
+                          </button>
+                        )
+                        return elements
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

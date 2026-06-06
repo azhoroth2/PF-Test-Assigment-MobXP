@@ -8,10 +8,32 @@ export default function Confirmation() {
 
   const demoParam = searchParams.get('demo')
   const isOffline = demoParam === 'offline'
+  const isPartialSync = demoParam === 'partial-sync'
   const submitted = isOffline ? 3 : (demoParam === 'partial' ? 2 : (state?.submitted ?? 3))
   const total = isOffline ? 3 : (demoParam === 'partial' ? 3 : (state?.total ?? 3))
-  const partial = !isOffline && (demoParam === 'partial' || state?.partial || submitted < total)
+  const partial = !isOffline && !isPartialSync && (demoParam === 'partial' || state?.partial || submitted < total)
   const remaining = total - submitted
+
+  const icon = isOffline ? '⏳' : isPartialSync ? '↻' : partial ? '⚠' : '✓'
+  const iconBg = (isOffline || partial || isPartialSync) ? 'var(--surface)' : '#e6f9ee'
+
+  const headline = isOffline
+    ? 'Saved — will send to HR when back online'
+    : isPartialSync
+    ? '2 sent ✓ · 1 still pending sync'
+    : partial
+    ? `${submitted} submitted · ${remaining} still need${remaining === 1 ? 's' : ''} your check`
+    : `${submitted} correction${submitted !== 1 ? 's' : ''} submitted`
+
+  const subtext = isOffline
+    ? "Your corrections are queued. You're free to leave."
+    : isPartialSync
+    ? 'One correction is waiting to sync. It will retry automatically when connected.'
+    : partial
+    ? 'The unfinished correction is still waiting. Come back when you can.'
+    : "Sent to HR for approval · they'll review within 24h"
+
+  const headlineColor = (!isOffline && !partial && !isPartialSync) ? 'var(--accent)' : 'var(--text-primary)'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, animation: 'screenEnter 220ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
@@ -25,46 +47,53 @@ export default function Confirmation() {
         textAlign: 'center',
         gap: 16,
       }}>
-        {/* Icon */}
         <div style={{
-          width: 72,
-          height: 72,
-          borderRadius: '50%',
-          background: isOffline ? 'var(--surface)' : (partial ? 'var(--surface)' : '#e6f9ee'),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 32,
-          marginBottom: 8,
+          width: 72, height: 72, borderRadius: '50%', background: iconBg,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isPartialSync ? 36 : 32, lineHeight: 1, marginBottom: 8,
           animation: 'scaleIn 300ms cubic-bezier(0.25, 1, 0.5, 1) 80ms both',
         }}>
-          {isOffline ? '⏳' : (partial ? '⚠' : '✓')}
+          {icon}
         </div>
 
-        {/* Headline */}
         <h2 style={{
-          fontSize: 20,
-          fontWeight: 600,
-          color: isOffline ? 'var(--text-primary)' : (partial ? 'var(--text-primary)' : 'var(--accent)'),
+          fontSize: 20, fontWeight: 600, color: headlineColor,
           animation: 'screenEnter 280ms cubic-bezier(0.25, 1, 0.5, 1) 160ms both',
         }}>
-          {isOffline
-            ? 'Saved — will send to HR when back online'
-            : (partial
-                ? `${submitted} submitted · ${remaining} still need${remaining === 1 ? 's' : ''} your check`
-                : `${submitted} correction${submitted !== 1 ? 's' : ''} submitted`)}
+          {headline}
         </h2>
 
-        {/* Subtext */}
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 280, animation: 'fadeIn 260ms cubic-bezier(0.25, 1, 0.5, 1) 240ms both' }}>
-          {isOffline
-            ? "Your corrections are queued. You're free to leave."
-            : (partial
-                ? 'The unfinished correction is still waiting. Come back when you can.'
-                : "Sent to HR for approval · they'll review within 24h")}
+          {subtext}
         </p>
 
-        {!partial && !isOffline && (
+        {isPartialSync && (
+          <div style={{
+            background: 'var(--surface)',
+            border: '1.5px solid var(--border)',
+            borderRadius: 10,
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            animation: 'fadeIn 240ms cubic-bezier(0.25, 1, 0.5, 1) 300ms both',
+          }}>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Piotr W. · Odd duration</span>
+            <span style={{
+              marginLeft: 'auto',
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              background: 'var(--bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+              padding: '2px 6px',
+            }}>
+              Pending
+            </span>
+          </div>
+        )}
+
+        {!partial && !isOffline && !isPartialSync && (
           <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5, maxWidth: 260, animation: 'fadeIn 240ms cubic-bezier(0.25, 1, 0.5, 1) 300ms both' }}>
             We'll only ping you if HR needs a detail.
           </p>
@@ -72,14 +101,11 @@ export default function Confirmation() {
       </div>
 
       <StickyActions
-        primary={{
-          label: 'Done',
-          onClick: () => navigate('/'),
-        }}
+        primary={{ label: 'Done', onClick: () => navigate('/') }}
         secondary={
-          !isOffline && partial
+          !isOffline && (partial || isPartialSync)
             ? {
-                label: 'Finish corrections',
+                label: isPartialSync ? 'Retry sync' : 'Finish corrections',
                 onClick: () => navigate('/corrections'),
               }
             : null

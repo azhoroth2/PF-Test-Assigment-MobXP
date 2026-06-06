@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import AnomalyChip from '../components/AnomalyChip'
 import ConfidenceBar from '../components/ConfidenceBar'
 import StickyActions from '../components/StickyActions'
@@ -9,17 +9,44 @@ const HIGH_THRESHOLD = 85
 
 export default function CorrectionFlow() {
   const navigate = useNavigate()
-  const [approved, setApproved] = useState([])
+  const [searchParams] = useSearchParams()
+  const demoParam = searchParams.get('demo') || 'bulk'
+
+  const isOffline = demoParam === 'offline'
+
+  const highConf = workers.filter((w) => w.confidence >= HIGH_THRESHOLD)
+  const lowConf = workers.filter((w) => w.confidence < HIGH_THRESHOLD)
+  const highConfIds = highConf.map((w) => w.id)
+
+  const initApproved = (demoParam === 'undo' || demoParam === 'manual') ? highConfIds : []
+
+  const [approved, setApproved] = useState(initApproved)
   const [expanded, setExpanded] = useState(false)
-  const [undoState, setUndoState] = useState(null)
+  const [undoState, setUndoState] = useState(
+    demoParam === 'undo' ? { count: highConf.length, prevApproved: [] } : null
+  )
   const undoTimerRef = useRef(null)
+
+  useEffect(() => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    if (demoParam === 'undo') {
+      setApproved(highConfIds)
+      setUndoState({ count: highConf.length, prevApproved: [] })
+      undoTimerRef.current = setTimeout(() => setUndoState(null), 5000)
+    } else if (demoParam === 'manual') {
+      setApproved(highConfIds)
+      setUndoState(null)
+    } else {
+      setApproved([])
+      setUndoState(null)
+    }
+    setExpanded(false)
+  }, [demoParam])
 
   useEffect(() => {
     return () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current) }
   }, [])
 
-  const highConf = workers.filter((w) => w.confidence >= HIGH_THRESHOLD)
-  const lowConf = workers.filter((w) => w.confidence < HIGH_THRESHOLD)
   const pendingHigh = highConf.filter((w) => !approved.includes(w.id))
   const pendingLow = lowConf.filter((w) => !approved.includes(w.id))
   const allDone = pendingHigh.length === 0 && pendingLow.length === 0
@@ -33,7 +60,7 @@ export default function CorrectionFlow() {
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
     undoTimerRef.current = setTimeout(() => setUndoState(null), 5000)
     const stillLow = lowConf.filter((w) => !newApproved.includes(w.id))
-    if (stillLow.length === 0) {
+    if (!isOffline && stillLow.length === 0) {
       navigate('/confirm', { state: { total: workers.length, submitted: workers.length } })
     }
   }
@@ -44,10 +71,22 @@ export default function CorrectionFlow() {
     setUndoState(null)
   }
 
+  const primaryLabel = isOffline
+    ? 'Saved — will send when online'
+    : pendingHigh.length > 0
+    ? `Approve ${pendingHigh.length}`
+    : 'Review remaining'
+
+  const primaryAction = isOffline
+    ? () => {}
+    : pendingHigh.length > 0
+    ? bulkApprove
+    : () => navigate(`/correction/${pendingLow[0]?.id}`)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, animation: 'screenEnter 220ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
       {/* Header */}
-      <div style={{ padding: '28px 20px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ padding: '28px 20px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
         <button
           onClick={() => navigate('/')}
           style={{
@@ -55,7 +94,11 @@ export default function CorrectionFlow() {
             color: 'var(--text-secondary)',
             fontSize: 22,
             lineHeight: 1,
-            padding: '4px 8px 4px 0',
+            
+            minHeight: 56,
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0',
           }}
         >
           ‹
@@ -69,21 +112,40 @@ export default function CorrectionFlow() {
       </div>
 
       <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* High-confidence group */}
-        {pendingHigh.length > 0 && (
+        {/* M5 — offline banner */}
+        {isOffline && (
           <div style={{
             background: 'var(--surface)',
-            borderRadius: 'var(--radius-card)',
-            overflow: 'hidden',
+            border: '1.5px solid var(--border)',
+            borderRadius: 10,
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
           }}>
+            <span style={{ fontSize: 15, color: 'var(--text-secondary)', flexShrink: 0 }}>⚠</span>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>
+              Offline — changes will sync when you reconnect.
+            </p>
+            <span style={{
+              marginLeft: 'auto',
+              background: 'var(--bg)',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              fontSize: 11,
+              color: 'var(--text-primary)',
+              padding: '2px 8px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}>1 pending</span>
+          </div>
+        )}
+
+        {/* High-confidence group */}
+        {pendingHigh.length > 0 && (
+          <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
             <div
-              style={{
-                padding: '16px 18px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-              }}
+              style={{ padding: '16px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
               onClick={() => setExpanded((e) => !e)}
             >
               <div>
@@ -100,9 +162,7 @@ export default function CorrectionFlow() {
                 transform: expanded ? 'rotate(90deg)' : 'none',
                 transition: 'transform 0.15s ease',
                 display: 'inline-block',
-              }}>
-                ›
-              </span>
+              }}>›</span>
             </div>
 
             {expanded && (
@@ -121,16 +181,17 @@ export default function CorrectionFlow() {
                       gap: 12,
                     }}
                   >
-                    <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {w.name}
                       </p>
-                      <p style={{ fontSize: 13, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {w.role} · suggested {w.suggestedTime}
+                      {/* V1: no truncation on subtitle so time always shows */}
+                      <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                        suggested {w.suggestedTime}
                       </p>
                     </div>
-                    <div style={{ minWidth: 100, flexShrink: 0 }}>
-                      <ConfidenceBar score={w.confidence} />
+                    <div style={{ flexShrink: 0, width: 90 }}>
+                      <ConfidenceBar score={w.confidence} compact />
                     </div>
                   </div>
                 ))}
@@ -151,21 +212,14 @@ export default function CorrectionFlow() {
             animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
           }}>
             <span style={{ fontSize: 20, color: 'var(--accent)' }}>✓</span>
-            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--accent)' }}>
-              {highConf.length} approved
-            </p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--accent)' }}>{highConf.length} approved</p>
           </div>
         )}
 
         {/* Low-confidence group */}
         {pendingLow.length > 0 && (
           <div>
-            <p style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              marginBottom: 10,
-            }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 10 }}>
               Needs your check · {pendingLow.length} worker{pendingLow.length !== 1 ? 's' : ''}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -203,18 +257,13 @@ export default function CorrectionFlow() {
         )}
 
         {allDone && (
-          <div style={{
-            background: '#e6f9ee',
-            borderRadius: 'var(--radius-card)',
-            padding: '20px 18px',
-            textAlign: 'center',
-          }}>
+          <div style={{ background: '#e6f9ee', borderRadius: 'var(--radius-card)', padding: '20px 18px', textAlign: 'center' }}>
             <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--accent)' }}>All corrections reviewed ✓</p>
           </div>
         )}
       </div>
 
-      {/* D4 — undo chip after bulk approve */}
+      {/* D4 — undo chip */}
       {undoState && (
         <div style={{ padding: '0 20px 12px', animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
           <div style={{
@@ -225,9 +274,7 @@ export default function CorrectionFlow() {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-            <p style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 500 }}>
-              Approved {undoState.count}
-            </p>
+            <p style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 500 }}>Approved {undoState.count}</p>
             <button
               onClick={handleUndo}
               style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', background: 'none', padding: '4px 8px' }}
@@ -238,21 +285,14 @@ export default function CorrectionFlow() {
         </div>
       )}
 
-      {/* Bottom actions */}
       {!allDone && (
-        <StickyActions
-          primary={
-            pendingHigh.length > 0
-              ? { label: `Approve ${pendingHigh.length}`, onClick: bulkApprove }
-              : { label: 'Review remaining', onClick: () => navigate(`/correction/${pendingLow[0]?.id}`) }
-          }
-        />
+        <StickyActions primary={{ label: primaryLabel, onClick: primaryAction }} />
       )}
       {allDone && (
         <StickyActions
           primary={{
-            label: 'Submit all',
-            onClick: () => navigate('/confirm', { state: { total: workers.length, submitted: workers.length } }),
+            label: isOffline ? 'Saved — will send when online' : 'Submit all',
+            onClick: () => !isOffline && navigate('/confirm', { state: { total: workers.length, submitted: workers.length } }),
           }}
         />
       )}

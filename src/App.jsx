@@ -16,17 +16,39 @@ export default function App() {
       <div style={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        paddingTop: 24,
-        paddingBottom: 24,
-        background: '#e8ecf0',
-        gap: 32,
+        alignItems: 'stretch',
+        background: '#ffffff',
       }}>
-        {/* Flowchart sidebar */}
-        <Flowchart />
+        {/* Flowchart — sticky sidebar */}
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          overflowY: 'auto',
+          padding: '32px 16px 32px 32px',
+          flexShrink: 0,
+          background: '#ffffff',
+          borderRight: '1px solid #e8ecf0',
+        }}>
+          <Flowchart />
+        </div>
 
-        {/* Phone frame */}
+        {/* Phone — centered horizontally and vertically */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'stretch',
+          minHeight: '100vh',
+        }}>
+        <div style={{
+          flex: 1,
+          margin: '32px',
+          borderRadius: 16,
+          background: '#E8ECF0',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <div style={{
           width: PHONE_W,
           height: PHONE_H,
@@ -72,6 +94,8 @@ export default function App() {
               <Route path="/hr-request" element={<HrRequest />} />
             </Routes>
           </div>
+        </div>
+        </div>
         </div>
       </div>
     </BrowserRouter>

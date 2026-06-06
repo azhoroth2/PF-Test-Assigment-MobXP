@@ -4,7 +4,8 @@ export default function StickyActions({ primary, secondary }) {
   const [submitting, setSubmitting] = useState(false)
 
   async function handlePrimary() {
-    if (submitting || primary.disabled) return
+    if (submitting) return
+    if (primary.disabled) { primary.onDisabledTap?.(); return }
     setSubmitting(true)
     try {
       await primary.onClick()
