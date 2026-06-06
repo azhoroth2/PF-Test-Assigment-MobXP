@@ -1,4 +1,8 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { workers } from '../data/workers'
+
+const EDGE_DEMOS = ['full-conflict', 'loading']
+const naturalState = (w) => w.confidence >= 85 ? 'high-confidence' : w.conflict ? 'conflict' : 'low-confidence'
 
 const NODES = [
   {
@@ -33,7 +37,6 @@ const NODES = [
         items: [
           { label: 'Bulk approve', desc: '≥85% conf', path: '/corrections', search: 'demo=bulk', active: (p, q) => p === '/corrections' && (!q || q === 'bulk') },
           { label: 'Undo approve', desc: 'D4 · tap Approve', path: '/corrections', search: 'demo=undo', active: (p, q) => p === '/corrections' && q === 'undo' },
-          { label: 'Manual review', desc: '<85% conf', path: '/corrections', search: 'demo=manual', active: (p, q) => p === '/corrections' && q === 'manual' },
         ],
       },
       {
@@ -50,27 +53,20 @@ const NODES = [
     match: (p) => p.startsWith('/correction/'),
     rows: [
       {
-        label: 'Happy path',
-        items: [
-          { label: 'High-conf', desc: '≥90%', path: '/correction/1', search: 'demo=high-confidence', active: (p, q) => p.startsWith('/correction/') && q === 'high-confidence' },
-          { label: 'Low-conf', desc: '60–89%', path: '/correction/1', search: 'demo=low-confidence', active: (p, q) => p.startsWith('/correction/') && q === 'low-confidence' },
-          { label: 'Conflict', desc: 'Signals clash', path: '/correction/3', search: 'demo=conflict', active: (p, q) => p.startsWith('/correction/') && q === 'conflict' },
-          { label: 'Dispute', desc: 'Follow-up', path: '/correction/3', search: 'demo=dispute', active: (p, q) => p.startsWith('/correction/') && q === 'dispute' },
-        ],
+        label: null,
+        items: workers.map((w) => ({
+          label: w.name,
+          desc: `${w.confidence}% · ${w.role}`,
+          path: `/correction/${w.id}`,
+          search: `demo=${naturalState(w)}`,
+          active: (p, q) => p === `/correction/${w.id}` && !EDGE_DEMOS.includes(q),
+        })),
       },
       {
         label: 'Edge cases',
         items: [
-          { label: 'Full conflict', desc: 'B3 · all clash', path: '/correction/3', search: 'demo=full-conflict', active: (p, q) => p.startsWith('/correction/') && q === 'full-conflict' },
-          { label: 'AI unavail.', desc: 'B1 · manual', path: '/correction/1', search: 'demo=ai-unavailable', active: (p, q) => p.startsWith('/correction/') && q === 'ai-unavailable' },
-          { label: 'Loading', desc: 'M4 · skeleton', path: '/correction/1', search: 'demo=loading', active: (p, q) => p.startsWith('/correction/') && q === 'loading' },
-        ],
-      },
-      {
-        label: 'Validation',
-        items: [
-          { label: 'Time bounds', desc: 'M2 · clock-in', path: '/correction/1', search: 'demo=time-bounds', active: (p, q) => p.startsWith('/correction/') && q === 'time-bounds' },
-          { label: 'Wrong roster', desc: 'M9 · not mine', path: '/correction/3', search: 'demo=wrong-roster', active: (p, q) => p.startsWith('/correction/') && q === 'wrong-roster' },
+          { label: 'Full conflict', desc: 'All signals clash', path: '/correction/3', search: 'demo=full-conflict', active: (p, q) => p.startsWith('/correction/') && q === 'full-conflict' },
+          { label: 'Loading', desc: 'Skeleton state', path: '/correction/1', search: 'demo=loading', active: (p, q) => p.startsWith('/correction/') && q === 'loading' },
         ],
       },
     ],

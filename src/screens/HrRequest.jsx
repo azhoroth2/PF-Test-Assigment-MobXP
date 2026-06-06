@@ -17,8 +17,8 @@ export default function HrRequest() {
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
           ✓
         </div>
-        <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Sent to HR — removed from your list</p>
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>HR will follow up with the right foreman.</p>
+        <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Sent to HR. Removed from your list.</p>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>HR will route this to the right foreman.</p>
       </div>
     )
   }
@@ -47,7 +47,7 @@ export default function HrRequest() {
           <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
             HR request
           </h2>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Action needed</p>
+          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Clock-out review</p>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export default function HrRequest() {
               HR needs a detail on Piotr W.
             </p>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Clock-out time for his Tuesday shift needs review before payroll closes.
+              Review Piotr's clock-out from Tuesday before payroll closes.
             </p>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>Received 17:42</p>
           </div>
@@ -90,7 +90,7 @@ export default function HrRequest() {
             What HR flagged
           </p>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Submitted clock-out (16:00) doesn't match Piotr's exit badge scan at 15:48. HR needs you to confirm the correct time.
+            Clock out time missing for Piotr W. Please clarify, escalate if necessary.
           </p>
         </div>
       </div>
@@ -100,10 +100,7 @@ export default function HrRequest() {
           label: 'Open correction',
           onClick: () => navigate({ pathname: '/correction/3', search: '?demo=full-conflict' }),
         }}
-        secondary={{
-          label: 'Not mine',
-          onClick: handleNotMine,
-        }}
+        secondary={null}
       />
     </div>
   )

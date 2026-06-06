@@ -18,12 +18,15 @@ export default function StickyActions({ primary, secondary }) {
 
   return (
     <div style={{
+      position: 'sticky',
+      bottom: 0,
       marginTop: 'auto',
       background: 'var(--bg)',
       borderTop: '1px solid var(--border)',
       padding: '12px 20px 20px',
       display: 'flex',
       gap: 12,
+      zIndex: 10,
     }}>
       {secondary && (
         <button

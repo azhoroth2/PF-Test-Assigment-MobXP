@@ -1,7 +1,7 @@
 export default function ConfidenceBar({ score }) {
-  const high = score >= 90
+  const high = score >= 85
   const color = high ? 'var(--accent)' : 'var(--text-secondary)'
-  const label = high ? `${score}% confident` : `${score}% – please check`
+  const label = high ? `${score}%` : `${score}% – please check`
 
   return (
     <div>

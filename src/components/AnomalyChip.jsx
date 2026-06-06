@@ -1,18 +1,17 @@
 export default function AnomalyChip({ label }) {
-  const isMissing = label === 'Missing clock-out'
   return (
     <span style={{
-      background: isMissing ? 'rgba(71,104,135,0.10)' : 'var(--surface)',
-      color: 'var(--text-secondary)',
-      border: isMissing ? '1.5px solid rgba(71,104,135,0.25)' : '1.5px solid transparent',
+      background: 'rgba(214, 130, 0, 0.10)',
+      color: '#a06000',
+      border: '1.5px solid rgba(214, 130, 0, 0.28)',
       borderRadius: 'var(--radius-btn)',
       fontSize: 12,
-      fontWeight: isMissing ? 600 : 500,
+      fontWeight: 600,
       padding: '4px 10px',
       whiteSpace: 'nowrap',
       flexShrink: 0,
     }}>
-      {isMissing ? '⏺ ' : ''}{label}
+      ⚠ {label}
     </span>
   )
 }

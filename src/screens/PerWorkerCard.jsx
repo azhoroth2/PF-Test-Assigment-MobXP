@@ -6,25 +6,18 @@ import TimeStepper from '../components/TimeStepper'
 import StickyActions from '../components/StickyActions'
 import { workers } from '../data/workers'
 
-const DEMO_STATES = ['high-confidence', 'low-confidence', 'conflict', 'dispute', 'ai-unavailable', 'full-conflict', 'time-bounds', 'wrong-roster', 'loading']
+const DEMO_STATES = ['high-confidence', 'low-confidence', 'conflict', 'dispute', 'full-conflict', 'loading']
 const LOW_CONF = workers.filter((w) => w.confidence < 85)
 
-function parseClockIn(shift) {
-  const match = shift?.match(/^(\d{2}:\d{2})/)
-  if (!match) return 0
-  const [h, m] = match[1].split(':').map(Number)
-  return h * 60 + m
-}
-
-function getDefaultReason(worker, demoState) {
+function getDefaultReason(demoState) {
   if (demoState === 'dispute' || demoState === 'full-conflict') return 'Dispute – follow up'
-  if (worker.confidence >= 90 && !['low-confidence', 'conflict', 'ai-unavailable'].includes(demoState)) return 'Schedule default'
+  if (demoState === 'high-confidence') return 'Schedule default'
   return null
 }
 
 function getDemoState(searchParam, worker) {
   if (DEMO_STATES.includes(searchParam)) return searchParam
-  if (worker.confidence >= 90) return 'high-confidence'
+  if (worker.confidence >= 85) return 'high-confidence'
   if (worker.conflict) return 'conflict'
   return 'low-confidence'
 }
@@ -52,48 +45,88 @@ function SkeletonBlock() {
   )
 }
 
+function calcTotal(clockIn, clockOut) {
+  if (!clockIn || !clockOut) return null
+  const [ih, im] = clockIn.split(':').map(Number)
+  const [oh, om] = clockOut.split(':').map(Number)
+  const mins = (oh * 60 + om) - (ih * 60 + im)
+  if (mins <= 0) return null
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  return m === 0 ? `${h}h` : `${h}h ${m}m`
+}
+
+function ShiftStrip({ clockIn, clockOut }) {
+  const total = calcTotal(clockIn, clockOut)
+  const na = { color: 'var(--text-muted)', fontWeight: 700 }
+  const val = { color: 'var(--text-primary)', fontWeight: 700 }
+  const coStyle = clockOut ? val : na
+  const totStyle = total ? val : na
+  return (
+    <div style={{
+      background: 'var(--surface)',
+      borderRadius: 'var(--radius-card)',
+      padding: '14px 18px',
+      display: 'flex',
+      alignItems: 'center',
+    }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Clock-in</p>
+        <p style={{ fontSize: 22, lineHeight: 1, ...(clockIn ? val : na) }}>{clockIn ?? 'N/A'}</p>
+      </div>
+
+      <span style={{ fontSize: 13, color: 'var(--border)', margin: '0 12px', marginTop: 10, flexShrink: 0 }}>→</span>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Clock-out</p>
+        <p style={{ fontSize: 22, lineHeight: 1, ...coStyle }}>{clockOut ?? 'N/A'}</p>
+      </div>
+
+      <div style={{ width: 1, background: 'var(--border)', alignSelf: 'stretch', margin: '0 16px', flexShrink: 0 }} />
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Total</p>
+        <p style={{ fontSize: 22, lineHeight: 1, ...totStyle }}>{total ?? 'N/A'}</p>
+      </div>
+    </div>
+  )
+}
+
 export default function PerWorkerCard() {
   const { workerId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const worker = workers.find((w) => w.id === Number(workerId)) || workers[0]
   const demoState = getDemoState(searchParams.get('demo'), worker)
 
-  const isAiUnavailable = demoState === 'ai-unavailable'
   const isLoading = demoState === 'loading'
-  const isWrongRoster = demoState === 'wrong-roster'
-  const isTimeBounds = demoState === 'time-bounds'
 
-  const effectiveConf =
-    demoState === 'high-confidence' ? 94 :
-    demoState === 'low-confidence' ? 62 :
-    demoState === 'conflict' ? 58 :
-    demoState === 'full-conflict' ? 42 :
-    62
+  const effectiveConf = worker.confidence
 
-  const clockInMins = parseClockIn(worker.shift)
   const aiSuggestedTime = worker.suggestedTime
 
-  const [selectedReason, setSelectedReason] = useState(() => getDefaultReason(worker, demoState))
+  const [selectedReason, setSelectedReason] = useState(() => getDefaultReason(demoState))
   const [reasonValid, setReasonValid] = useState(() => {
-    const r = getDefaultReason(worker, demoState)
+    const r = getDefaultReason(demoState)
     return r !== null && r !== 'Other'
   })
-  const [showEditCard, setShowEditCard] = useState(() => isAiUnavailable || isTimeBounds)
-  const [confirmedTime, setConfirmedTime] = useState(() => isTimeBounds ? '08:05' : worker.suggestedTime)
+  const [showEditCard, setShowEditCard] = useState(false)
+  const [confirmedTime, setConfirmedTime] = useState(() => worker.suggestedTime)
   const [showReasonHint, setShowReasonHint] = useState(false)
+  const [workerPinged, setWorkerPinged] = useState(false)
   const [loadingDone, setLoadingDone] = useState(false)
   const loadingRef = useRef(null)
 
   useEffect(() => {
-    const r = getDefaultReason(worker, demoState)
+    const r = getDefaultReason(demoState)
     setSelectedReason(r)
     setReasonValid(r !== null && r !== 'Other')
-    setShowEditCard(demoState === 'ai-unavailable' || demoState === 'time-bounds')
-    setConfirmedTime(demoState === 'time-bounds' ? '08:05' : worker.suggestedTime)
+    setShowEditCard(false)
+    setConfirmedTime(worker.suggestedTime)
     setShowReasonHint(false)
+    setWorkerPinged(false)
     setLoadingDone(false)
     if (loadingRef.current) clearTimeout(loadingRef.current)
     if (demoState === 'loading') {
@@ -104,6 +137,12 @@ export default function PerWorkerCard() {
   useEffect(() => {
     return () => { if (loadingRef.current) clearTimeout(loadingRef.current) }
   }, [])
+
+  useEffect(() => {
+    if (!searchParams.get('demo')) {
+      setSearchParams({ demo: demoState }, { replace: true, state: location.state })
+    }
+  }, [workerId])
 
   const handleReasonChange = useCallback((r) => {
     setSelectedReason(r)
@@ -129,20 +168,17 @@ export default function PerWorkerCard() {
     })
   }
 
-  function handleNotMine() {
-    navigate('/', { state: { notMineConfirmed: true } })
-  }
-
   function handleResetTime() {
     setConfirmedTime(aiSuggestedTime)
     setShowEditCard(false)
   }
 
+  const badgeScan = worker.badgeScan
   const reasoningText =
     demoState === 'full-conflict'
-      ? 'Schedule says 16:00 but clock data and team pattern disagree — confirm with worker.'
+      ? `Schedule ${worker.suggestedTime}${badgeScan ? `, badge scan ${badgeScan}` : ''}, usual departure 16:40. All three signals conflict.`
       : demoState === 'conflict'
-      ? `Schedule says ${worker.suggestedTime} but worker usually leaves 16:40 – confirm with worker`
+      ? `Schedule ${worker.suggestedTime}${badgeScan ? `, badge scan ${badgeScan}` : ''}. Worker usually leaves 16:40. Confirm which is correct.`
       : worker.reasoning
 
   const isDispute = demoState === 'dispute' || selectedReason === 'Dispute – follow up'
@@ -151,7 +187,6 @@ export default function PerWorkerCard() {
   const workerIdx = LOW_CONF.findIndex((w) => w.id === Number(workerId))
   const showStepCounter = from === 'batch' && workerIdx >= 0
 
-  const showAiUnavailable = isAiUnavailable || (isLoading && loadingDone)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, animation: 'screenEnter 220ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
@@ -182,72 +217,39 @@ export default function PerWorkerCard() {
               : `${worker.role} · ${worker.shift} shift`}
           </p>
         </div>
+        <div
+          aria-hidden="true"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: 'var(--surface)',
+            border: '1.5px solid var(--border)',
+            color: 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M14 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3.5L8 15l2.5-3H14a1 1 0 001-1V3a1 1 0 00-1-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+          </svg>
+        </div>
       </div>
 
-      {/* M9 — wrong-roster warning */}
-      {isWrongRoster && (
-        <div style={{
-          margin: '0 20px 4px',
-          background: 'var(--surface)',
-          border: '1.5px solid var(--border)',
-          borderRadius: 10,
-          padding: '12px 14px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
-        }}>
-          <span style={{ fontSize: 15, color: 'var(--text-secondary)', flexShrink: 0 }}>⚠</span>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-            Not on your line — confirm this is yours before submitting.
-          </p>
-        </div>
-      )}
 
       <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto' }}>
         {/* M4 — skeleton loading */}
         {isLoading && !loadingDone && <SkeletonBlock />}
 
-        {/* AI unavailable: notice + stepper */}
-        {!isLoading && showAiUnavailable && (
-          <>
-            <div style={{
-              background: 'var(--surface)',
-              borderRadius: 'var(--radius-card)',
-              padding: '18px',
-              display: 'flex',
-              gap: 12,
-              alignItems: 'flex-start',
-            }}>
-              <span style={{ fontSize: 20, color: 'var(--text-secondary)', marginTop: 1, flexShrink: 0 }}>⚠</span>
-              <div>
-                <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
-                  AI couldn't suggest a time
-                </p>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  Enter it manually below.
-                </p>
-              </div>
-            </div>
-            <div style={{
-              background: 'var(--surface)',
-              borderRadius: 'var(--radius-card)',
-              padding: '16px 18px',
-            }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                Adjust clock-out time
-              </p>
-              <TimeStepper
-                value={confirmedTime}
-                onChange={handleTimeChange}
-                minMins={0}
-              />
-            </div>
-          </>
+        {/* Clock-in / out / total strip */}
+        {(!isLoading || loadingDone) && (
+          <ShiftStrip clockIn={worker.clockIn} clockOut={worker.clockOut} />
         )}
 
         {/* AI suggestion card (with inline Edit time action) */}
-        {!isLoading && !showAiUnavailable && (
+        {(!isLoading || loadingDone) && (
           <div style={{
             background: 'var(--bg)',
             border: '1.5px solid var(--border)',
@@ -262,7 +264,7 @@ export default function PerWorkerCard() {
               <p style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-primary)' }}>
                 {aiSuggestedTime}
               </p>
-              {!showEditCard && !isDispute && (
+              {!showEditCard && (
                 <button
                   onClick={() => setShowEditCard(true)}
                   aria-label="Edit time"
@@ -293,8 +295,56 @@ export default function PerWorkerCard() {
           </div>
         )}
 
+        {/* Notify worker — button or pending chip */}
+        {(!isLoading || loadingDone) && (
+          workerPinged ? (
+            <div style={{
+              background: 'var(--surface)',
+              border: '1.5px solid var(--border)',
+              borderRadius: 'var(--radius-card)',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              animation: 'fadeSlideDown 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+            }}>
+              <span style={{ fontSize: 15, flexShrink: 0 }}>⏳</span>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>
+                Waiting on worker
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', flexShrink: 0 }}>
+                Sent {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={() => setWorkerPinged(true)}
+              style={{
+                width: '100%',
+                minHeight: 52,
+                borderRadius: 'var(--radius-card)',
+                background: 'var(--surface)',
+                border: '1.5px solid var(--border)',
+                color: 'var(--text-secondary)',
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M14 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3.5L8 15l2.5-3H14a1 1 0 001-1V3a1 1 0 00-1-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+              </svg>
+              Notify worker
+            </button>
+          )
+        )}
+
         {/* Edit time card (visible when user opened editor, AI present) */}
-        {!isLoading && !showAiUnavailable && showEditCard && (
+        {(!isLoading || loadingDone) && showEditCard && (
           <div style={{
             background: 'var(--surface)',
             borderRadius: 'var(--radius-card)',
@@ -307,7 +357,7 @@ export default function PerWorkerCard() {
             <TimeStepper
               value={confirmedTime}
               onChange={handleTimeChange}
-              minMins={isTimeBounds ? clockInMins : 0}
+              minMins={0}
             />
             {confirmedTime !== aiSuggestedTime && (
               <button
@@ -334,9 +384,11 @@ export default function PerWorkerCard() {
         {/* Reason section */}
         {!isLoading && (
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 12 }}>
-              Why this time?
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: 0.5 }}>OR</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            </div>
             <ReasonPills
               selected={selectedReason}
               onChange={handleReasonChange}
@@ -356,14 +408,10 @@ export default function PerWorkerCard() {
         primary={{
           label: isDispute ? 'Submit dispute' : `Confirm ${confirmedTime}`,
           onClick: handleConfirm,
-          disabled: !isLoading && (!selectedReason || !reasonValid),
+          disabled: (isLoading && !loadingDone) || !selectedReason || !reasonValid,
           onDisabledTap: () => setShowReasonHint(true),
         }}
-        secondary={
-          isWrongRoster
-            ? { label: 'Not mine — send to HR', onClick: handleNotMine }
-            : null
-        }
+        secondary={null}
       />
     </div>
   )

@@ -3,24 +3,23 @@ import { useState } from 'react'
 const REASONS = ['Schedule default', 'Dispute – follow up', 'Other']
 
 export default function ReasonPills({ selected, onChange, onValidChange }) {
-  const [otherText, setOtherText] = useState('')
+  const [comment, setComment] = useState('')
 
   function handleSelect(reason) {
     onChange(reason)
     if (reason === 'Other') {
-      onValidChange?.(otherText.trim().length > 0)
+      onValidChange?.(comment.trim().length > 0)
     } else {
       onValidChange?.(true)
     }
   }
 
-  function handleOtherText(e) {
-    const val = e.target.value
-    setOtherText(val)
-    onValidChange?.(val.trim().length > 0)
+  function handleComment(e) {
+    setComment(e.target.value)
+    if (selected === 'Other') {
+      onValidChange?.(e.target.value.trim().length > 0)
+    }
   }
-
-  const showOther = selected === 'Other'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -46,7 +45,7 @@ export default function ReasonPills({ selected, onChange, onValidChange }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              transition: 'background 180ms cubic-bezier(0.25, 1, 0.5, 1), border-color 180ms cubic-bezier(0.25, 1, 0.5, 1), color 150ms ease, transform 100ms cubic-bezier(0.25, 1, 0.5, 1)',
+              transition: 'background 180ms cubic-bezier(0.25, 1, 0.5, 1), border-color 180ms cubic-bezier(0.25, 1, 0.5, 1), color 150ms ease',
             }}
           >
             <span>{r}</span>
@@ -54,34 +53,31 @@ export default function ReasonPills({ selected, onChange, onValidChange }) {
           </button>
         )
       })}
-      {showOther && (
-        <div style={{ marginTop: 4 }}>
-          <input
-            autoFocus
-            type="text"
-            value={otherText}
-            onChange={handleOtherText}
-            placeholder="Add a short reason…"
-            maxLength={200}
-            aria-label="Other reason"
-            style={{
-              width: '100%',
-              height: 48,
-              border: `1.5px solid ${otherText.trim().length > 0 ? 'var(--border)' : 'var(--accent)'}`,
-              borderRadius: 'var(--radius-btn)',
-              padding: '0 12px',
-              fontSize: 14,
-              fontFamily: 'var(--font)',
-              color: 'var(--text-primary)',
-              background: 'var(--bg)',
-              outline: 'none',
-            }}
-          />
-          <p style={{ fontSize: 11, color: otherText.trim().length > 0 ? 'var(--text-muted)' : 'var(--text-secondary)', marginTop: 4 }}>
-            {otherText.trim().length === 0 ? 'Required — describe the reason to continue' : `${otherText.length}/200`}
-          </p>
-        </div>
-      )}
+      <textarea
+        value={comment}
+        onChange={handleComment}
+        placeholder={selected === 'Other' ? 'Describe the reason (required)' : 'Add a comment (optional)'}
+        maxLength={300}
+        rows={3}
+        style={{
+          width: '100%',
+          marginTop: 4,
+          border: selected === 'Other' && comment.trim().length === 0
+            ? '1.5px solid var(--text-secondary)'
+            : '1.5px solid var(--border)',
+          borderRadius: 'var(--radius-btn)',
+          padding: '12px',
+          fontSize: 14,
+          fontFamily: 'var(--font)',
+          color: 'var(--text-primary)',
+          background: 'var(--surface)',
+          outline: 'none',
+          resize: 'none',
+          lineHeight: 1.5,
+          boxSizing: 'border-box',
+          transition: 'border-color 150ms ease',
+        }}
+      />
     </div>
   )
 }

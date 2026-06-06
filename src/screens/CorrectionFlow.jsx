@@ -18,7 +18,7 @@ export default function CorrectionFlow() {
   const lowConf = workers.filter((w) => w.confidence < HIGH_THRESHOLD)
   const highConfIds = highConf.map((w) => w.id)
 
-  const initApproved = (demoParam === 'undo' || demoParam === 'manual') ? highConfIds : []
+  const initApproved = demoParam === 'undo' ? highConfIds : []
 
   const [approved, setApproved] = useState(initApproved)
   const [expanded, setExpanded] = useState(false)
@@ -33,9 +33,6 @@ export default function CorrectionFlow() {
       setApproved(highConfIds)
       setUndoState({ count: highConf.length, prevApproved: [] })
       undoTimerRef.current = setTimeout(() => setUndoState(null), 5000)
-    } else if (demoParam === 'manual') {
-      setApproved(highConfIds)
-      setUndoState(null)
     } else {
       setApproved([])
       setUndoState(null)
@@ -72,7 +69,7 @@ export default function CorrectionFlow() {
   }
 
   const primaryLabel = isOffline
-    ? 'Saved — will send when online'
+    ? 'Saved. Sends when back online.'
     : pendingHigh.length > 0
     ? `Approve ${pendingHigh.length}`
     : 'Review remaining'
@@ -81,7 +78,7 @@ export default function CorrectionFlow() {
     ? () => {}
     : pendingHigh.length > 0
     ? bulkApprove
-    : () => navigate(`/correction/${pendingLow[0]?.id}`)
+    : () => navigate(`/correction/${pendingLow[0]?.id}`, { state: { from: 'batch' } })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, animation: 'screenEnter 220ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
@@ -115,29 +112,18 @@ export default function CorrectionFlow() {
         {/* M5 — offline banner */}
         {isOffline && (
           <div style={{
-            background: 'var(--surface)',
-            border: '1.5px solid var(--border)',
+            background: 'rgba(214, 130, 0, 0.08)',
+            border: '1.5px solid rgba(214, 130, 0, 0.28)',
             borderRadius: 10,
             padding: '12px 14px',
             display: 'flex',
             alignItems: 'center',
             gap: 10,
           }}>
-            <span style={{ fontSize: 15, color: 'var(--text-secondary)', flexShrink: 0 }}>⚠</span>
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>
-              Offline — changes will sync when you reconnect.
+            <span style={{ fontSize: 15, color: '#a06000', flexShrink: 0 }}>⚠</span>
+            <p style={{ fontSize: 13, color: '#a06000', lineHeight: 1.4, fontWeight: 500 }}>
+              Offline. Changes will sync when you reconnect.
             </p>
-            <span style={{
-              marginLeft: 'auto',
-              background: 'var(--bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 6,
-              fontSize: 11,
-              color: 'var(--text-primary)',
-              padding: '2px 8px',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}>1 pending</span>
           </div>
         )}
 
@@ -153,7 +139,7 @@ export default function CorrectionFlow() {
                   Ready to approve · high confidence
                 </p>
                 <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
-                  {pendingHigh.length} worker{pendingHigh.length !== 1 ? 's' : ''} · AI matched to shift schedule
+                  {pendingHigh.length} worker{pendingHigh.length !== 1 ? 's' : ''} · AI suggestion matches schedule
                 </p>
               </div>
               <span style={{
@@ -190,9 +176,7 @@ export default function CorrectionFlow() {
                         suggested {w.suggestedTime}
                       </p>
                     </div>
-                    <div style={{ flexShrink: 0, width: 90 }}>
-                      <ConfidenceBar score={w.confidence} compact />
-                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', flexShrink: 0 }}>{w.confidence}%</span>
                   </div>
                 ))}
               </div>
@@ -234,22 +218,23 @@ export default function CorrectionFlow() {
                     padding: '16px 18px',
                     minHeight: 72,
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'space-between',
                     cursor: 'pointer',
                     boxShadow: 'var(--shadow-card)',
                     gap: 12,
                   }}
                 >
-                  <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
                     <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {w.name}
                     </p>
-                    <p style={{ fontSize: 14, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {w.role} · {w.shift}
                     </p>
+                    <AnomalyChip label={w.anomaly} />
                   </div>
-                  <AnomalyChip label={w.anomaly} />
+                  <span style={{ fontSize: 20, color: 'var(--text-muted)', flexShrink: 0, lineHeight: 1, alignSelf: 'center' }}>›</span>
                 </div>
               ))}
             </div>
@@ -291,7 +276,7 @@ export default function CorrectionFlow() {
       {allDone && (
         <StickyActions
           primary={{
-            label: isOffline ? 'Saved — will send when online' : 'Submit all',
+            label: isOffline ? 'Saved. Sends when back online.' : 'Submit all',
             onClick: () => !isOffline && navigate('/confirm', { state: { total: workers.length, submitted: workers.length } }),
           }}
         />

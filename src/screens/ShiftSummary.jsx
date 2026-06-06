@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import AnomalyChip from '../components/AnomalyChip'
 import StickyActions from '../components/StickyActions'
@@ -16,6 +17,8 @@ export default function ShiftSummary() {
 
   const demoParam = searchParams.get('demo')
   const demoState = STATES.includes(demoParam) ? demoParam : 'default'
+
+  const [allNotified, setAllNotified] = useState(false)
 
   const isOffline = demoState === 'offline'
   const isMultiLine = demoState === 'multi-line'
@@ -42,7 +45,6 @@ export default function ShiftSummary() {
             color: 'var(--text-secondary)',
             fontSize: 22,
             lineHeight: 1,
-            
             minHeight: 56,
             display: 'flex',
             alignItems: 'center',
@@ -61,99 +63,167 @@ export default function ShiftSummary() {
         </div>
       </div>
 
-      <div style={{ flex: 1, padding: '0 20px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* A1 — offline banner */}
-        {isOffline && (
+      {count === 0 ? (
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px 32px',
+          textAlign: 'center',
+          gap: 16,
+        }}>
           <div style={{
-            background: 'var(--surface)',
-            border: '1.5px solid var(--border)',
-            borderRadius: 10,
-            padding: '12px 14px',
+            width: 80,
+            height: 80,
+            borderRadius: '50%',
+            background: 'rgba(0,185,80,0.10)',
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
-            animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+            justifyContent: 'center',
+            marginBottom: 8,
+            animation: 'scaleIn 300ms cubic-bezier(0.25, 1, 0.5, 1) 80ms both',
           }}>
-            <span style={{ fontSize: 15, color: 'var(--text-secondary)', flexShrink: 0 }}>⚠</span>
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>
-              Showing last sync · 16:30. You can still review.
-            </p>
+            <svg width="36" height="36" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <path d="M6 16L13 23L26 10" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
-        )}
-
-        {/* Summary band */}
-        <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-card)', padding: 18 }}>
-          {count === 0 ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontSize: 28 }}>✓</span>
-              <div>
-                <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--accent)' }}>All clear</p>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>21 clocked out cleanly ✓</p>
+          <h2 style={{
+            fontSize: 22,
+            fontWeight: 700,
+            color: 'var(--accent)',
+            animation: 'screenEnter 280ms cubic-bezier(0.25, 1, 0.5, 1) 160ms both',
+          }}>
+            All clear
+          </h2>
+          <p style={{
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+            maxWidth: 260,
+            animation: 'fadeIn 260ms cubic-bezier(0.25, 1, 0.5, 1) 240ms both',
+          }}>
+            21 workers clocked out cleanly. No corrections needed.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div style={{ flex: 1, padding: '0 20px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* A1 — offline banner */}
+            {isOffline && (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1.5px solid var(--border)',
+                borderRadius: 10,
+                padding: '12px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+              }}>
+                <span style={{ fontSize: 15, color: 'var(--text-secondary)', flexShrink: 0 }}>⚠</span>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>
+                  Showing last sync · 16:30. You can still review.
+                </p>
               </div>
-            </div>
-          ) : (
-            <>
+            )}
+
+            {/* Summary band */}
+            <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-card)', padding: 18 }}>
               <p style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
-                {count} worker{count !== 1 ? 's' : ''} need{count === 1 ? 's' : ''} a clock-out
+                {count} issue{count !== 1 ? 's' : ''} found
               </p>
               <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
                 {21 - count} clocked out cleanly ✓
               </p>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
-                Nothing else needs you tonight.
+            </div>
+
+            {/* Notify all */}
+            {allNotified ? (
+              <div style={{
+                background: 'var(--surface)',
+                border: '1.5px solid var(--border)',
+                borderRadius: 'var(--radius-card)',
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                animation: 'fadeSlideDown 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+              }}>
+                <span style={{ fontSize: 15, flexShrink: 0 }}>⏳</span>
+              <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>
+                Waiting on {count} workers
               </p>
-            </>
-          )}
-        </div>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', flexShrink: 0 }}>
+                Sent {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAllNotified(true)}
+                style={{
+                  width: '100%',
+                  minHeight: 52,
+                  borderRadius: 'var(--radius-card)',
+                  background: 'var(--surface)',
+                  border: '1.5px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M14 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3.5L8 15l2.5-3H14a1 1 0 001-1V3a1 1 0 00-1-1z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+                </svg>
+                Notify all {count} workers
+              </button>
+            )}
 
-        {/* Empty state affirmation */}
-        {count === 0 && (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 0' }}>
-            <p style={{ fontSize: 14, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6, maxWidth: 220 }}>
-              You're done for the day — nothing else needs you tonight.
-            </p>
-          </div>
-        )}
-
-        {/* Multi-line: Line A group */}
-        {isMultiLine && lineAWorkers.length > 0 && (
-          <WorkerGroup
-            label="Line A"
-            workers={lineAWorkers}
-            onTap={(w) => navigate(`/correction/${w.id}`, { state: { from: 'list' } })}
-          />
-        )}
-
-        {/* Multi-line: Line B group */}
-        {isMultiLine && lineBWorkers.length > 0 && (
-          <WorkerGroup
-            label="Line B"
-            workers={lineBWorkers}
-            onTap={() => {}}
-          />
-        )}
-
-        {/* Single-line: flat list */}
-        {!isMultiLine && lineAWorkers.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {lineAWorkers.map((w) => (
-              <WorkerRow
-                key={w.id}
-                worker={w}
-                onTap={() => navigate(`/correction/${w.id}`, { state: { from: 'list' } })}
+            {/* Multi-line: Line A group */}
+            {isMultiLine && lineAWorkers.length > 0 && (
+              <WorkerGroup
+                label="Line A"
+                workers={lineAWorkers}
+                onTap={(w) => navigate(`/correction/${w.id}`, { state: { from: 'list' } })}
               />
-            ))}
-          </div>
-        )}
-      </div>
+            )}
 
-      {count > 0 && (
-        <StickyActions
-          primary={{
-            label: `Review ${count} correction${count !== 1 ? 's' : ''}`,
-            onClick: () => navigate('/corrections'),
-          }}
-        />
+            {/* Multi-line: Line B group */}
+            {isMultiLine && lineBWorkers.length > 0 && (
+              <WorkerGroup
+                label="Line B"
+                workers={lineBWorkers}
+                onTap={() => {}}
+              />
+            )}
+
+            {/* Single-line: flat list */}
+            {!isMultiLine && lineAWorkers.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {lineAWorkers.map((w) => (
+                  <WorkerRow
+                    key={w.id}
+                    worker={w}
+                    onTap={() => navigate(`/correction/${w.id}`, { state: { from: 'list' } })}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <StickyActions
+            primary={{
+              label: `Review ${count} correction${count !== 1 ? 's' : ''}`,
+              onClick: () => navigate('/corrections'),
+            }}
+          />
+        </>
       )}
     </div>
   )
@@ -185,22 +255,23 @@ function WorkerRow({ worker: w, onTap }) {
         padding: '16px 18px',
         minHeight: 72,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         cursor: 'pointer',
         boxShadow: 'var(--shadow-card)',
         gap: 12,
       }}
     >
-      <div style={{ minWidth: 0, overflow: 'hidden' }}>
+      <div style={{ minWidth: 0, flex: 1 }}>
         <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {w.name}
         </p>
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {w.role} · {w.shift}
         </p>
+        <AnomalyChip label={w.anomaly} />
       </div>
-      <AnomalyChip label={w.anomaly} />
+      <span style={{ fontSize: 20, color: 'var(--text-muted)', flexShrink: 0, lineHeight: 1, alignSelf: 'center' }}>›</span>
     </div>
   )
 }

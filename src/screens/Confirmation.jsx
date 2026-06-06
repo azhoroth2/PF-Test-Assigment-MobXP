@@ -18,7 +18,7 @@ export default function Confirmation() {
   const iconBg = (isOffline || partial || isPartialSync) ? 'var(--surface)' : 'rgba(0,185,80,0.10)'
 
   const headline = isOffline
-    ? 'Saved — will send to HR when back online'
+    ? 'Saved. Sends to HR when back online.'
     : isPartialSync
     ? '2 sent ✓ · 1 still pending sync'
     : partial
@@ -26,12 +26,12 @@ export default function Confirmation() {
     : `${submitted} correction${submitted !== 1 ? 's' : ''} submitted`
 
   const subtext = isOffline
-    ? "Your corrections are queued. You're free to leave."
+    ? 'Queued. Sends automatically when back online.'
     : isPartialSync
-    ? 'One correction is waiting to sync. It will retry automatically when connected.'
+    ? 'One sync pending. Will retry automatically when connected.'
     : partial
-    ? 'The unfinished correction is still waiting. Come back when you can.'
-    : "Sent to HR for approval · they'll review within 24h"
+    ? 'One correction still needs your check.'
+    : "Sent to HR. They'll review within 24h."
 
   const headlineColor = (!isOffline && !partial && !isPartialSync) ? 'var(--accent)' : 'var(--text-primary)'
 
@@ -67,49 +67,62 @@ export default function Confirmation() {
         </p>
 
         {isPartialSync && (
-          <div style={{
-            background: 'var(--surface)',
-            border: '1.5px solid var(--border)',
-            borderRadius: 10,
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            animation: 'fadeIn 240ms cubic-bezier(0.25, 1, 0.5, 1) 300ms both',
-          }}>
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Piotr W. · Odd duration</span>
-            <span style={{
-              marginLeft: 'auto',
-              fontSize: 11,
-              fontWeight: 600,
-              color: 'var(--text-secondary)',
-              background: 'var(--bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 4,
-              padding: '2px 6px',
+          <>
+            <div style={{
+              background: 'var(--surface)',
+              border: '1.5px solid var(--border)',
+              borderRadius: 10,
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              width: '100%',
+              maxWidth: 320,
+              animation: 'fadeIn 240ms cubic-bezier(0.25, 1, 0.5, 1) 300ms both',
             }}>
-              Pending
-            </span>
-          </div>
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Piotr W. · Odd duration</span>
+              <span style={{
+                marginLeft: 'auto',
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                background: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 4,
+                padding: '2px 6px',
+              }}>
+                Pending
+              </span>
+            </div>
+            <button
+              onClick={() => navigate('/corrections')}
+              style={{
+                width: '100%',
+                maxWidth: 320,
+                height: 56,
+                fontSize: 16,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                background: 'var(--surface)',
+                border: '1.5px solid var(--border)',
+                borderRadius: 'var(--radius-btn)',
+                cursor: 'pointer',
+                animation: 'fadeIn 240ms cubic-bezier(0.25, 1, 0.5, 1) 360ms both',
+              }}
+            >
+              Retry sync
+            </button>
+          </>
         )}
 
-        {!partial && !isOffline && !isPartialSync && (
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5, maxWidth: 260, animation: 'fadeIn 240ms cubic-bezier(0.25, 1, 0.5, 1) 300ms both' }}>
-            We'll only ping you if HR needs a detail.
-          </p>
-        )}
       </div>
 
       <StickyActions
-        primary={{ label: 'Done', onClick: () => navigate('/') }}
-        secondary={
-          !isOffline && (partial || isPartialSync)
-            ? {
-                label: isPartialSync ? 'Retry sync' : 'Finish corrections',
-                onClick: () => navigate('/corrections'),
-              }
-            : null
-        }
+        primary={{
+          label: partial ? 'Finish corrections' : 'Done',
+          onClick: () => partial ? navigate('/corrections') : navigate('/'),
+        }}
+        secondary={null}
       />
     </div>
   )
