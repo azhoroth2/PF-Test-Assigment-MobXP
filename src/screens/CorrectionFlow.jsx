@@ -135,14 +135,14 @@ export default function CorrectionFlow() {
               onClick={() => setExpanded((e) => !e)}
             >
               <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                <p data-annotation-id="corrections.high-conf-band" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
                   Ready to approve · high confidence
                 </p>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+                <p data-annotation-id="corrections.threshold" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
                   {pendingHigh.length} worker{pendingHigh.length !== 1 ? 's' : ''} · AI suggestion matches schedule
                 </p>
               </div>
-              <span style={{
+              <span data-annotation-id="corrections.expand-chevron" style={{
                 fontSize: 18,
                 color: 'var(--text-muted)',
                 transform: expanded ? 'rotate(90deg)' : 'none',
@@ -203,7 +203,7 @@ export default function CorrectionFlow() {
         {/* Low-confidence group */}
         {pendingLow.length > 0 && (
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 10 }}>
+            <p data-annotation-id="corrections.needs-check" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 10 }}>
               Needs your check · {pendingLow.length} worker{pendingLow.length !== 1 ? 's' : ''}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -251,7 +251,7 @@ export default function CorrectionFlow() {
       {/* D4 — undo chip */}
       {undoState && (
         <div style={{ padding: '0 20px 12px', animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both' }}>
-          <div style={{
+          <div data-annotation-id="corrections.undo-strip" style={{
             background: 'rgba(0,185,80,0.08)',
             borderRadius: 10,
             padding: '12px 16px',
@@ -271,7 +271,14 @@ export default function CorrectionFlow() {
       )}
 
       {!allDone && (
-        <StickyActions primary={{ label: primaryLabel, onClick: primaryAction }} />
+        <StickyActions
+          data-annotation-id={
+            isOffline ? 'corrections.offline-cta'
+            : pendingHigh.length > 0 ? 'corrections.approve-cta'
+            : 'corrections.review-remaining-cta'
+          }
+          primary={{ label: primaryLabel, onClick: primaryAction }}
+        />
       )}
       {allDone && (
         <StickyActions

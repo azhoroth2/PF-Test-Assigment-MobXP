@@ -1,6 +1,6 @@
-export default function AnomalyChip({ label }) {
+export default function AnomalyChip({ label, annotationId }) {
   return (
-    <span style={{
+    <span data-annotation-id={annotationId} style={{
       background: 'rgba(214, 130, 0, 0.10)',
       color: '#a06000',
       border: '1.5px solid rgba(214, 130, 0, 0.28)',

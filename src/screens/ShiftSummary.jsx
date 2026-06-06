@@ -57,23 +57,26 @@ export default function ShiftSummary() {
           <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
             Shift summary
           </h1>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+          <p data-annotation-id="shift.timestamp" style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
             {isMultiLine ? 'Lines A & B' : 'Line A'} · ended 16:00 · reviewed 16:30
           </p>
         </div>
       </div>
 
       {count === 0 ? (
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '40px 32px',
-          textAlign: 'center',
-          gap: 16,
-        }}>
+        <div
+          data-annotation-id="shift.empty-state"
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '40px 32px',
+            textAlign: 'center',
+            gap: 16,
+          }}
+        >
           <div style={{
             width: 80,
             height: 80,
@@ -112,16 +115,19 @@ export default function ShiftSummary() {
           <div style={{ flex: 1, padding: '0 20px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* A1 — offline banner */}
             {isOffline && (
-              <div style={{
-                background: 'var(--surface)',
-                border: '1.5px solid var(--border)',
-                borderRadius: 10,
-                padding: '12px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
-              }}>
+              <div
+                data-annotation-id="shift.offline-banner"
+                style={{
+                  background: 'var(--surface)',
+                  border: '1.5px solid var(--border)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  animation: 'fadeIn 200ms cubic-bezier(0.25, 1, 0.5, 1) both',
+                }}
+              >
                 <span style={{ fontSize: 15, color: 'var(--text-secondary)', flexShrink: 0 }}>⚠</span>
                 <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>
                   Showing last sync · 16:30. You can still review.
@@ -130,7 +136,10 @@ export default function ShiftSummary() {
             )}
 
             {/* Summary band */}
-            <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-card)', padding: 18 }}>
+            <div
+              data-annotation-id="shift.multiline-count"
+              style={{ background: 'var(--surface)', borderRadius: 'var(--radius-card)', padding: 18 }}
+            >
               <p style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                 {count} issue{count !== 1 ? 's' : ''} found
               </p>
@@ -190,6 +199,8 @@ export default function ShiftSummary() {
               <WorkerGroup
                 label="Line A"
                 workers={lineAWorkers}
+                firstAnnotationId="shift.worker-card"
+                firstChipAnnotationId="shift.anomaly-chip"
                 onTap={(w) => navigate(`/correction/${w.id}`, { state: { from: 'list' } })}
               />
             )}
@@ -199,6 +210,7 @@ export default function ShiftSummary() {
               <WorkerGroup
                 label="Line B"
                 workers={lineBWorkers}
+                firstAnnotationId="shift.lineb-worker"
                 onTap={() => {}}
               />
             )}
@@ -206,10 +218,12 @@ export default function ShiftSummary() {
             {/* Single-line: flat list */}
             {!isMultiLine && lineAWorkers.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {lineAWorkers.map((w) => (
+                {lineAWorkers.map((w, i) => (
                   <WorkerRow
                     key={w.id}
                     worker={w}
+                    annotationId={i === 0 ? 'shift.worker-card' : undefined}
+                    chipAnnotationId={i === 0 ? 'shift.anomaly-chip' : undefined}
                     onTap={() => navigate(`/correction/${w.id}`, { state: { from: 'list' } })}
                   />
                 ))}
@@ -218,6 +232,7 @@ export default function ShiftSummary() {
           </div>
 
           <StickyActions
+            data-annotation-id="shift.review-cta"
             primary={{
               label: `Review ${count} correction${count !== 1 ? 's' : ''}`,
               onClick: () => navigate('/corrections'),
@@ -229,24 +244,31 @@ export default function ShiftSummary() {
   )
 }
 
-function WorkerGroup({ label, workers, onTap }) {
+function WorkerGroup({ label, workers, firstAnnotationId, firstChipAnnotationId, onTap }) {
   return (
     <div>
       <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>
         {label} · {workers.length} worker{workers.length !== 1 ? 's' : ''}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {workers.map((w) => (
-          <WorkerRow key={w.id} worker={w} onTap={() => onTap(w)} />
+        {workers.map((w, i) => (
+          <WorkerRow
+            key={w.id}
+            worker={w}
+            annotationId={i === 0 ? firstAnnotationId : undefined}
+            chipAnnotationId={i === 0 ? firstChipAnnotationId : undefined}
+            onTap={() => onTap(w)}
+          />
         ))}
       </div>
     </div>
   )
 }
 
-function WorkerRow({ worker: w, onTap }) {
+function WorkerRow({ worker: w, onTap, annotationId, chipAnnotationId }) {
   return (
     <div
+      data-annotation-id={annotationId}
       onClick={onTap}
       style={{
         background: 'var(--bg)',
@@ -269,7 +291,7 @@ function WorkerRow({ worker: w, onTap }) {
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {w.role} · {w.shift}
         </p>
-        <AnomalyChip label={w.anomaly} />
+        <AnomalyChip label={w.anomaly} annotationId={chipAnnotationId} />
       </div>
       <span style={{ fontSize: 20, color: 'var(--text-muted)', flexShrink: 0, lineHeight: 1, alignSelf: 'center' }}>›</span>
     </div>

@@ -53,7 +53,7 @@ export default function HrRequest() {
 
       <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Notification card */}
-        <div style={{
+        <div data-annotation-id="hr.notification-card" style={{
           background: 'var(--surface)',
           borderRadius: 'var(--radius-card)',
           padding: '18px',
@@ -79,7 +79,7 @@ export default function HrRequest() {
         </div>
 
         {/* What HR flagged */}
-        <div style={{
+        <div data-annotation-id="hr.flagged-card" style={{
           background: 'var(--bg)',
           border: '1.5px solid var(--border)',
           borderRadius: 'var(--radius-card)',
@@ -95,7 +95,10 @@ export default function HrRequest() {
         </div>
       </div>
 
+      {/* Ghost anchor for dead-code annotation: "Not mine" button was never wired */}
+      <div data-annotation-id="hr.not-mine" style={{ height: 0, overflow: 'hidden' }} aria-hidden="true" />
       <StickyActions
+        data-annotation-id="hr.open-correction-cta"
         primary={{
           label: 'Open correction',
           onClick: () => navigate({ pathname: '/correction/3', search: '?demo=full-conflict' }),

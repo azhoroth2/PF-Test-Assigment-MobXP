@@ -241,7 +241,11 @@ export default function PerWorkerCard() {
 
       <div style={{ flex: 1, padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto' }}>
         {/* M4 — skeleton loading */}
-        {isLoading && !loadingDone && <SkeletonBlock />}
+        {isLoading && !loadingDone && (
+          <div data-annotation-id="per-worker.skeleton">
+            <SkeletonBlock />
+          </div>
+        )}
 
         {/* Clock-in / out / total strip */}
         {(!isLoading || loadingDone) && (
@@ -250,7 +254,7 @@ export default function PerWorkerCard() {
 
         {/* AI suggestion card (with inline Edit time action) */}
         {(!isLoading || loadingDone) && (
-          <div style={{
+          <div data-annotation-id="per-worker.card-root" style={{
             background: 'var(--bg)',
             border: '1.5px solid var(--border)',
             borderRadius: 'var(--radius-card)',
@@ -261,11 +265,12 @@ export default function PerWorkerCard() {
               AI suggestion
             </p>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <p style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-primary)' }}>
+              <p data-annotation-id="per-worker.ai-time" style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-primary)' }}>
                 {aiSuggestedTime}
               </p>
               {!showEditCard && (
                 <button
+                  data-annotation-id="per-worker.edit-pencil"
                   onClick={() => setShowEditCard(true)}
                   aria-label="Edit time"
                   style={{
@@ -288,8 +293,10 @@ export default function PerWorkerCard() {
                 </button>
               )}
             </div>
-            <ConfidenceBar score={effectiveConf} />
-            <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 12, lineHeight: 1.5, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+            <div data-annotation-id="per-worker.confidence-bar">
+              <ConfidenceBar score={effectiveConf} />
+            </div>
+            <p data-annotation-id="per-worker.reasoning" style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 12, lineHeight: 1.5, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
               {reasoningText}
             </p>
           </div>
@@ -318,6 +325,7 @@ export default function PerWorkerCard() {
             </div>
           ) : (
             <button
+              data-annotation-id="per-worker.notify-worker"
               onClick={() => setWorkerPinged(true)}
               style={{
                 width: '100%',
@@ -383,7 +391,7 @@ export default function PerWorkerCard() {
 
         {/* Reason section */}
         {!isLoading && (
-          <div>
+          <div data-annotation-id="per-worker.reason-pills">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
               <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: 0.5 }}>OR</span>
@@ -405,6 +413,7 @@ export default function PerWorkerCard() {
       </div>
 
       <StickyActions
+        data-annotation-id="per-worker.confirm-cta"
         primary={{
           label: isDispute ? 'Submit dispute' : `Confirm ${confirmedTime}`,
           onClick: handleConfirm,

@@ -55,14 +55,17 @@ export default function Confirmation() {
           {icon}
         </div>
 
-        <h2 style={{
-          fontSize: 20, fontWeight: 600, color: headlineColor,
-          animation: 'screenEnter 280ms cubic-bezier(0.25, 1, 0.5, 1) 160ms both',
-        }}>
+        <h2
+          data-annotation-id="confirm.headline"
+          style={{
+            fontSize: 20, fontWeight: 600, color: headlineColor,
+            animation: 'screenEnter 280ms cubic-bezier(0.25, 1, 0.5, 1) 160ms both',
+          }}
+        >
           {headline}
         </h2>
 
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 280, animation: 'fadeIn 260ms cubic-bezier(0.25, 1, 0.5, 1) 240ms both' }}>
+        <p data-annotation-id="confirm.subtext" style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 280, animation: 'fadeIn 260ms cubic-bezier(0.25, 1, 0.5, 1) 240ms both' }}>
           {subtext}
         </p>
 
@@ -95,6 +98,7 @@ export default function Confirmation() {
               </span>
             </div>
             <button
+              data-annotation-id="confirm.retry-sync"
               onClick={() => navigate('/corrections')}
               style={{
                 width: '100%',
@@ -118,6 +122,7 @@ export default function Confirmation() {
       </div>
 
       <StickyActions
+        data-annotation-id="confirm.done-cta"
         primary={{
           label: partial ? 'Finish corrections' : 'Done',
           onClick: () => partial ? navigate('/corrections') : navigate('/'),
