@@ -43,55 +43,18 @@ export default function CoverSlide() {
 
         {/* Title */}
         <h1 style={{
-          fontSize: 56,
+          fontSize: 64,
           fontWeight: 800,
           color: 'var(--page-nav-text)',
           letterSpacing: '-2px',
-          lineHeight: 1.05,
-          textAlign: 'center',
+          lineHeight: 1.1,
           margin: 0,
-          marginBottom: 20,
-          maxWidth: 800,
+          marginBottom: 24,
         }}>
           Attendance Correction Layer
         </h1>
 
-        <p style={{
-          fontSize: 22,
-          fontWeight: 500,
-          color: 'var(--text-secondary)',
-          textAlign: 'center',
-          margin: 0,
-          marginBottom: 32,
-          letterSpacing: '-0.3px',
-        }}>
-          PeopleForce Blue-Collar
-        </p>
 
-        {/* Thesis */}
-        <div style={{
-          padding: '20px 32px',
-          background: 'var(--surface)',
-          borderRadius: 14,
-          borderLeft: '3px solid var(--accent)',
-          marginBottom: 48,
-          maxWidth: 640,
-        }}>
-          <p style={{
-            fontSize: 17,
-            fontWeight: 500,
-            color: 'var(--page-nav-text)',
-            lineHeight: 1.5,
-            textAlign: 'center',
-            margin: 0,
-            fontStyle: 'italic',
-          }}>
-            "PF already has the compliance engine.{' '}
-            <span style={{ color: 'var(--accent)', fontWeight: 700, fontStyle: 'normal' }}>
-              This is the gate that keeps it clean.
-            </span>"
-          </p>
-        </div>
 
         {/* Author */}
         <div style={{

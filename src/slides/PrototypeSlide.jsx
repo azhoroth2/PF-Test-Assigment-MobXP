@@ -1,5 +1,39 @@
 import { useRef, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, useMatch, useSearchParams } from 'react-router-dom'
+import { Tag } from './SlideLayout'
+
+function ValidationCard({ id, risk, question, assumption, test, ifFails }) {
+  const riskColor = risk === 'High' ? '#f59e0b' : 'var(--text-secondary)'
+  const riskBg = risk === 'High' ? 'rgba(245,158,11,0.04)' : 'transparent'
+  
+  return (
+    <div style={{
+      padding: '12px',
+      background: riskBg,
+      borderRadius: 8,
+      border: '1px solid var(--border)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Tag color={riskColor}>{risk}</Tag>
+      </div>
+      <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--page-nav-text)', margin: 0, lineHeight: 1.3 }}>{question}</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div>
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Assumption: </span>
+          <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{assumption}</span>
+        </div>
+        <div>
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Test: </span>
+          <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{test}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 import Flowchart, { NODES } from '../components/Flowchart'
 import ShiftSummary from '../screens/ShiftSummary'
 import CorrectionFlow from '../screens/CorrectionFlow'
@@ -218,8 +252,50 @@ export default function PrototypeSlide() {
         flexShrink: 0,
         background: 'var(--page-sidebar-bg)',
         borderRight: '1px solid var(--page-sidebar-border)',
+        display: 'flex',
+        flexDirection: 'column',
       }}>
         <Flowchart />
+
+        <div style={{ marginTop: 'auto', paddingTop: 40, paddingBottom: 20 }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: 12,
+          }}>
+            <div style={{ width: 12, height: 2, background: 'var(--accent)' }} />
+            <span style={{
+              fontSize: 10,
+              fontWeight: 800,
+              color: 'var(--page-nav-text)',
+              textTransform: 'uppercase',
+              letterSpacing: 1.5,
+            }}>
+              Validations
+            </span>
+            <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <ValidationCard
+              id="V3"
+              risk="High"
+              question="Will foremen trust and use bulk-approve without re-opening each item?"
+              assumption="At ≥90% confidence, foremen will accept bulk approval without reviewing individually."
+              test="Usability testing with 5 foremen: measure tap-through rate vs individual review rate."
+              ifFails="Bulk-approve UX needs redesign — possibly show summary of all items before confirm."
+            />
+            <ValidationCard
+              id="V5"
+              risk="Medium"
+              question="Do pre-defined tap reasons cover ≥85% of real correction causes?"
+              assumption="Three reason categories cover most cases."
+              test='Pilot data: measure frequency of "Other" reason selection.'
+              ifFails='Add 1–2 more reason categories based on "Other" freetext analysis.'
+            />
+          </div>
+        </div>
       </div>
 
       {/* Phone area */}

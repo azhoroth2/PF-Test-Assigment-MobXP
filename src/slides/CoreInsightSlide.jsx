@@ -1,132 +1,103 @@
-import SlideLayout, { FlowArrow, FlowBox } from './SlideLayout'
+import SlideLayout from './SlideLayout'
+
+const HYPOTHESES = [
+  {
+    type: 'Problem — Foreman',
+    belief: 'We believe a Foreman spends 30–60 minutes per shift manually tracking missed clock-outs and logging corrections without an audit trail. This creates fragmented data HR cannot verify.',
+    threshold: 'Confirmed if ≥3 of 5 Foremen name this a daily operational pain.',
+    color: '#f59e0b',
+    bg: 'rgba(245,158,11,0.05)',
+    border: 'rgba(245,158,11,0.2)',
+  },
+  {
+    type: 'Problem — HR Manager',
+    belief: 'We believe an HR Manager spends 4–8 hours monthly on manual attendance reconciliation before payroll. Errors generate compliance violations and PIP fine risk of PLN 1k–30k.',
+    threshold: 'Confirmed if ≥3 of 5 HR managers name this a top-3 pain.',
+    color: '#ef4444',
+    bg: 'rgba(239,68,68,0.03)',
+    border: 'rgba(239,68,68,0.15)',
+  },
+  {
+    type: 'Solution',
+    belief: 'We believe if the system automatically detects attendance anomalies and proposes corrections with an audit trail — Foreman confirms in 2 minutes instead of 30, HR closes the payroll cycle in 1 hour instead of 8.',
+    threshold: 'Confirmed when pre-payroll reconciliation time drops 70%+ in pilot.',
+    color: 'var(--accent)',
+    bg: 'rgba(0,185,80,0.04)',
+    border: 'rgba(0,185,80,0.2)',
+  },
+]
 
 export default function CoreInsightSlide() {
   return (
-    <SlideLayout verticalCenter>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 0,
-        padding: '0 32px',
-      }}>
-        {/* Overline */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          marginBottom: 12,
-        }}>
-          <span style={{
-            fontSize: 11,
-            fontWeight: 800,
-            color: 'var(--accent)',
-            letterSpacing: 1.2,
-            textTransform: 'uppercase',
+    <SlideLayout
+      sectionNumber={10}
+      sectionLabel="Key Hypotheses"
+      title="Key Hypotheses"
+      subtitle="Three core hypotheses that must be true for this product to succeed, with explicit confirmation thresholds."
+    >
+      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'stretch' }}>
+        {HYPOTHESES.map((h) => (
+          <div key={h.type} style={{
+            flex: 1,
+            minWidth: 300,
+            padding: '24px',
+            background: 'var(--surface)',
+            borderRadius: 14,
+            border: `1.5px solid ${h.border}`,
+            display: 'flex',
+            flexDirection: 'column',
           }}>
-            09 — Core Insight
-          </span>
-        </div>
+            <p style={{
+              fontSize: 11,
+              fontWeight: 800,
+              color: h.color,
+              textTransform: 'uppercase',
+              letterSpacing: 1,
+              marginBottom: 16,
+            }}>
+              {h.type}
+            </p>
+            
+            <p style={{
+              fontSize: 15,
+              fontWeight: 500,
+              color: 'var(--page-nav-text)',
+              lineHeight: 1.5,
+              marginBottom: 24,
+              flex: 1,
+            }}>
+              "{h.belief}"
+            </p>
 
-        {/* Big statement */}
-        <h1 style={{
-          fontSize: 44,
-          fontWeight: 800,
-          color: 'var(--page-nav-text)',
-          letterSpacing: '-1.5px',
-          lineHeight: 1.15,
-          textAlign: 'center',
-          margin: 0,
-          marginBottom: 12,
-          maxWidth: 700,
-        }}>
-          Garbage In,{' '}
-          <span style={{ color: '#ef4444' }}>Garbage Out</span>
-        </h1>
-
-        <p style={{
-          fontSize: 22,
-          fontWeight: 500,
-          color: 'var(--text-secondary)',
-          textAlign: 'center',
-          margin: 0,
-          marginBottom: 56,
-          maxWidth: 600,
-          lineHeight: 1.45,
-        }}>
-          PF already has the compliance engine.{' '}
-          <span style={{ fontWeight: 700, color: 'var(--page-nav-text)' }}>
-            The problem is what reaches it.
-          </span>
-        </p>
-
-        {/* Pipeline diagram */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          gap: 0,
-          marginBottom: 48,
-          width: '100%',
-          maxWidth: 900,
-        }}>
-          <FlowBox isExisting>
-            <div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>Hardware</div>
-              Clock-in<br />(QR / RFID)
+            <div style={{
+              padding: '12px 16px',
+              background: h.bg,
+              borderRadius: 8,
+              border: `1px solid ${h.border}`,
+            }}>
+              <p style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: h.color,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                marginBottom: 4,
+                margin: 0,
+              }}>
+                Confirmation Threshold
+              </p>
+              <p style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+                margin: 0,
+                lineHeight: 1.4,
+              }}>
+                {h.threshold}
+              </p>
             </div>
-          </FlowBox>
-          <FlowArrow />
-          <FlowBox isMissing>
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>MISSING</div>
-              Correction Layer
-            </div>
-          </FlowBox>
-          <FlowArrow />
-          <FlowBox isExisting>
-            <div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>Existing</div>
-              PF Compliance<br />Engine
-            </div>
-          </FlowBox>
-          <FlowArrow />
-          <FlowBox isExisting>
-            <div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>Moat</div>
-              Optima /<br />enova365
-            </div>
-          </FlowBox>
-          <FlowArrow />
-          <FlowBox isExisting>
-            <div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 4 }}>Output</div>
-              Payroll
-            </div>
-          </FlowBox>
-        </div>
-
-        {/* Bottom statement */}
-        <div style={{
-          padding: '20px 32px',
-          background: 'var(--surface)',
-          borderLeft: '3px solid var(--accent)',
-          borderRadius: '0 12px 12px 0',
-          maxWidth: 640,
-        }}>
-          <p style={{
-            fontSize: 16,
-            fontWeight: 600,
-            color: 'var(--page-nav-text)',
-            lineHeight: 1.5,
-            textAlign: 'center',
-            margin: 0,
-            fontStyle: 'italic',
-          }}>
-            "This is not a feature redesign. It is the gate that protects everything downstream."
-          </p>
-        </div>
+          </div>
+        ))}
       </div>
     </SlideLayout>
   )

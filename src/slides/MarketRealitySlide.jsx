@@ -70,7 +70,7 @@ export default function MarketRealitySlide() {
         </div>
       </div>
 
-      <Callout>"Opportunity is real. It is not a vacuum."</Callout>
+      <Callout>Why Poland & CEE? High density of manufacturing SMBs, complex local labor laws, and a massive shift from paper to digital currently underway.</Callout>
     </SlideLayout>
   )
 }

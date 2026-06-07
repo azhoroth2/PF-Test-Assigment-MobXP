@@ -21,6 +21,16 @@ export default function SolutionArchSlide() {
       sectionLabel="Solution Design"
       title="Solution"
       subtitle="Where the correction layer sits in PF's existing stack — and what it explicitly does not touch."
+      validations={[
+        {
+          id: 'V8',
+          risk: 'Low',
+          question: 'Does pre-built format actually eliminate export errors in the wild?',
+          assumption: 'Pre-formatted payroll export prevents formatting errors at the export step.',
+          test: 'Pilot: count export errors before vs after pre-built format.',
+          ifFails: 'Add pre-export validation step with error preview.',
+        }
+      ]}
     >
       {/* Stack diagram */}
       <div style={{
@@ -55,13 +65,7 @@ export default function SolutionArchSlide() {
             PF Compliance<br />Engine
           </div>
         </FlowBox>
-        <FlowArrow />
-        <FlowBox isExisting>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 3 }}>Moat</div>
-            Optima /<br />enova365
-          </div>
-        </FlowBox>
+
         <FlowArrow />
         <FlowBox isExisting>
           <div>

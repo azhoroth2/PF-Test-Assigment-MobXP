@@ -6,6 +6,7 @@ export default function SlideLayout({
   children,
   fullBleed = false,
   verticalCenter = false,
+  validations = null,
 }) {
   return (
     <div style={{
@@ -98,6 +99,99 @@ export default function SlideLayout({
         {/* Content */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {children}
+          
+          {/* Validations Footer */}
+          {validations && validations.length > 0 && (
+            <div style={{ marginTop: 'auto', paddingTop: 64 }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                marginBottom: 16,
+                padding: fullBleed ? '0 64px' : 0,
+              }}>
+                <div style={{ width: 16, height: 2, background: 'var(--accent)' }} />
+                <span style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: 'var(--page-nav-text)',
+                  textTransform: 'uppercase',
+                  letterSpacing: 1.5,
+                }}>
+                  De-Risking / Validation Plan
+                </span>
+                <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: fullBleed ? '0 64px' : 0 }}>
+                {validations.map((h) => {
+                  const riskColor = h.risk === 'Highest' ? '#ef4444' : h.risk === 'High' ? '#f59e0b' : h.risk === 'Medium' ? 'var(--text-secondary)' : 'var(--text-muted)'
+                  const riskBg = h.risk === 'Highest' ? 'rgba(239,68,68,0.06)' : h.risk === 'High' ? 'rgba(245,158,11,0.04)' : 'transparent'
+
+                  return (
+                    <div key={h.id} style={{
+                      padding: '16px 20px',
+                      background: riskBg,
+                      borderRadius: 12,
+                      border: h.critical ? '1.5px solid rgba(239,68,68,0.2)' : '1px solid var(--border)',
+                      display: 'flex',
+                      gap: 16,
+                      alignItems: 'flex-start',
+                    }}>
+                      {/* Risk badge */}
+                      <div style={{
+                        flexShrink: 0,
+                        marginTop: 2,
+                      }}>
+                        <Tag color={riskColor}>{h.risk}</Tag>
+                      </div>
+
+                      {/* Content */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: 'var(--page-nav-text)',
+                          lineHeight: 1.35,
+                          marginBottom: 8,
+                          marginTop: 0,
+                        }}>
+                          {h.question}
+                        </p>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                          <div>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
+                              Assumption
+                            </p>
+                            <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
+                              {h.assumption}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
+                              Test method
+                            </p>
+                            <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
+                              {h.test}
+                            </p>
+                          </div>
+                          <div>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: h.critical ? '#ef4444' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
+                              If disconfirmed
+                            </p>
+                            <p style={{ fontSize: 12, color: h.critical ? '#ef4444' : 'var(--text-secondary)', lineHeight: 1.4, margin: 0, fontWeight: h.critical ? 600 : 400 }}>
+                              {h.ifFails}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

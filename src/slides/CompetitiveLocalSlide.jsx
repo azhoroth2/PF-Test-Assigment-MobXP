@@ -102,7 +102,7 @@ export default function CompetitiveLocalSlide() {
         </p>
       </div>
 
-      <Callout>"This is differentiated displacement. Not greenfield entry."</Callout>
+      <Callout>"Opportunity is real. It is not a vacuum."</Callout>
     </SlideLayout>
   )
 }

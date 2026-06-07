@@ -105,7 +105,7 @@ const COLUMNS = ['Pain Point', 'Severity', 'PF Can Solve Now', 'Competitor Gap',
 export default function PainMatrixSlide() {
   return (
     <SlideLayout
-      sectionNumber={7}
+      sectionNumber={8}
       sectionLabel="Problem Selection"
       title="Pain Matrix"
       subtitle="Attendance correction is the only pain that scores green across all four columns."

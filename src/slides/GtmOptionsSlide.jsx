@@ -70,12 +70,6 @@ export default function GtmOptionsSlide() {
         highlightColor="rgba(0,185,80,0.06)"
       />
 
-      <div style={{ marginTop: 24, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <Tag color="var(--accent)">Design-Partner</Tag>
-        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-          → Validates demand with 3–5 paid pilots before committing to full build
-        </span>
-      </div>
     </SlideLayout>
   )
 }

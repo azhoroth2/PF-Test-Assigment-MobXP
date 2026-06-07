@@ -41,6 +41,33 @@ export default function AiArchitectureSlide() {
       sectionLabel="AI & Validation"
       title="AI Architecture — Where Yes, Where No"
       subtitle="AI has a specific, bounded role. Every boundary is a design decision, not a limitation."
+      validations={[
+        {
+          id: 'V4',
+          risk: 'Highest',
+          question: 'Is the confidence score actually trustworthy — calibration unproven?',
+          assumption: 'AI can generate a reliable confidence score from 4 signals.',
+          test: 'Backtest against 90 days of historical clock-in/out data from 3 pilot factories.',
+          ifFails: 'AI feature is wrong — confidence score becomes misleading, not helpful.',
+          critical: true,
+        },
+        {
+          id: 'V7',
+          risk: 'High',
+          question: 'Does the expandable audit trail create genuine HR confidence or theater?',
+          assumption: 'HR managers will review expanded AI reasoning and feel confident enough to approve.',
+          test: 'Task-based testing with 3 HR managers: can they explain why a correction was approved?',
+          ifFails: 'Audit trail is decoration. Need to redesign what information is surfaced.',
+        },
+        {
+          id: 'V2',
+          risk: 'Medium',
+          question: 'Is +30 min the right notification delay?',
+          assumption: '30 minutes post-shift gives foreman enough time to finish handoff.',
+          test: 'A/B test: 15 min vs 30 min vs 45 min delay — measure open rate + completion rate.',
+          ifFails: 'Adjust delay — likely to 45 min based on shift handoff duration data.',
+        }
+      ]}
     >
       <div style={{ display: 'flex', gap: 20, marginBottom: 32, flexWrap: 'wrap' }}>
         {/* YES column */}

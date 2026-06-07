@@ -33,10 +33,21 @@ const WINS = [
 export default function ProblemSelectionSlide() {
   return (
     <SlideLayout
-      sectionNumber={8}
+      sectionNumber={9}
       sectionLabel="Problem Selection"
       title="Why This, Not That"
       subtitle="Explicit rejections — then why attendance correction is the right problem."
+      validations={[
+        {
+          id: 'V1',
+          risk: 'Highest',
+          question: 'Is missed clock-out actually the core problem — or a rare edge case?',
+          assumption: 'Missed clock-outs happen frequently enough to justify a dedicated correction layer.',
+          test: 'Discovery interviews with 20–30 foremen: frequency of missed clock-outs per shift.',
+          ifFails: 'Problem selection is wrong. Pivot to a different pain point entirely.',
+          critical: true,
+        }
+      ]}
     >
       {/* Rejections */}
       <div style={{ marginBottom: 36 }}>

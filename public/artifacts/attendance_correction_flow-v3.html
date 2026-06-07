@@ -1014,6 +1014,16 @@ window.addEventListener('load', () => setTimeout(() => { annotateBlockers(); ren
 const wrap = document.querySelector('.diagram-wrap');
 wrap.addEventListener('scroll', () => { clearBadges(); annotateBlockers(); renderTagPills(); renderValidationBadges(); });
 window.addEventListener('resize', () => { clearBadges(); setTimeout(() => { annotateBlockers(); renderTagPills(); renderValidationBadges(); }, 100); });
+
+// After Mermaid finishes, wait a tick and send height
+setTimeout(() => {
+  const h = document.documentElement.scrollHeight;
+  window.parent.postMessage({ type: 'resize', height: h }, '*');
+}, 500);
+setTimeout(() => {
+  const h = document.documentElement.scrollHeight;
+  window.parent.postMessage({ type: 'resize', height: h }, '*');
+}, 1500);
 </script>
 </body>
 </html>
