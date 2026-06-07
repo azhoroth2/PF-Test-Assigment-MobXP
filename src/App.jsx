@@ -19,7 +19,6 @@ import CoreInsightSlide from './slides/CoreInsightSlide'
 import TwoUsersSlide from './slides/TwoUsersSlide'
 import SolutionArchSlide from './slides/SolutionArchSlide'
 import FlowBlockersSlide from './slides/FlowBlockersSlide'
-import InteractivePrototypeOverviewSlide from './slides/InteractivePrototypeOverviewSlide'
 import PrototypeSlide from './slides/PrototypeSlide'
 import AiArchitectureSlide from './slides/AiArchitectureSlide'
 import ValidationPlanSlide from './slides/ValidationPlanSlide'
@@ -84,9 +83,8 @@ const SLIDES = [
   { id: 'problem-selection',  label: 'Selection',        component: ProblemSelectionSlide },
   { id: 'core-insight',       label: 'Core Insight',     component: CoreInsightSlide },
   { id: 'two-users',          label: 'Users',            component: TwoUsersSlide },
-  { id: 'solution-arch',      label: 'Architecture',     component: SolutionArchSlide },
   { id: 'flow-blockers',      label: 'Blockers',         component: FlowBlockersSlide },
-  { id: 'prototype-overview', label: 'Screens',          component: InteractivePrototypeOverviewSlide },
+  { id: 'solution-arch',      label: 'Solution',         component: SolutionArchSlide },
   { id: 'prototype',          label: 'Prototype',        component: PrototypeSlide },
   { id: 'ai-arch',            label: 'AI',               component: AiArchitectureSlide },
   { id: 'validation',         label: 'Validation',       component: ValidationPlanSlide },

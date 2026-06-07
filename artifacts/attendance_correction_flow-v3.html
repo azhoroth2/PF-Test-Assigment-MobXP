@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Correction Flow — Blockers & Solutions</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0c0e12;
+    color: #dde1ea;
+    min-height: 100vh;
+    padding: 24px;
+    line-height: 1.5;
+  }
+
+  header {
+    max-width: 1500px;
+    margin: 0 auto 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #1e2330;
+  }
+
+  h1 { font-size: 21px; font-weight: 600; margin-bottom: 5px; }
+
+  .subtitle { color: #7a8299; font-size: 13px; margin-bottom: 14px; }
+
+  .scenario-banner {
+    background: #1a1f10;
+    border: 1px solid #5a7a35;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: #c5dfa0;
+  }
+  .scenario-banner strong { color: #dde1ea; }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .btn {
+    background: #161b27;
+    border: 1px solid #1e2330;
+    color: #dde1ea;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: #1e2535; border-color: #3a4060; }
+  .btn.active { background: #1e2a45; border-color: #4a7adc; color: #8ab4f8; }
+
+  .persona-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-left: 16px;
+  }
+  .persona-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #7a8299;
+  }
+  .persona-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .diagram-wrap {
+    max-width: 1500px;
+    margin: 0 auto;
+    background: #13161e;
+    border: 1px solid #1e2330;
+    border-radius: 12px;
+    padding: 28px;
+    overflow: auto;
+    position: relative;
+  }
+
+  .mermaid { text-align: center; background: transparent; }
+  .mermaid svg { max-width: 100%; height: auto; }
+
+  .blocker-node rect,
+  .blocker-node polygon,
+  .blocker-node circle {
+    stroke: #e05c3a !important;
+    stroke-width: 3px !important;
+    filter: drop-shadow(0 0 7px rgba(224, 92, 58, 0.5));
+    cursor: help;
+  }
+  .blocker-node:hover rect,
+  .blocker-node:hover polygon {
+    stroke: #ff7a5a !important;
+    filter: drop-shadow(0 0 14px rgba(224, 92, 58, 0.8));
+  }
+
+  .ai-node rect {
+    stroke: #38bdf8 !important;
+    stroke-width: 2px !important;
+    filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.35));
+  }
+
+  .validation-node rect,
+  .validation-node polygon {
+    stroke-dasharray: 4 3 !important;
+  }
+
+  .validation-badge {
+    position: absolute;
+    background: #7c5cff;
+    color: #fff;
+    min-width: 22px; height: 22px;
+    padding: 0 5px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    z-index: 11;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    border: 2px solid #13161e;
+    cursor: help;
+    pointer-events: auto;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .validation-badge:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(124, 92, 255, 0.8);
+  }
+
+  .problem-badge {
+    position: absolute;
+    background: #e05c3a;
+    color: #fff;
+    width: 21px; height: 21px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    border: 2px solid #13161e;
+  }
+
+  .tag-pills {
+    position: absolute;
+    display: flex;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 9;
+    transform: translateY(-50%);
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 3px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    border: 1px solid;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.45);
+    letter-spacing: 0.02em;
+  }
+  /* persona pills */
+  .pill-worker   { background:#10210f; color:#a8d99a; border-color:#4f7a3e; }
+  .pill-foreman  { background:#21180a; color:#e6c27a; border-color:#8a6a2f; }
+  .pill-hr       { background:#101a2e; color:#9fc0f5; border-color:#3a5a9a; }
+  .pill-payroll  { background:#241228; color:#d9a8e0; border-color:#7a4a82; }
+  .pill-system   { background:#0d1f28; color:#7fd4f0; border-color:#2f6f8a; }
+  /* device pills */
+  .pill-dev { background:#161b27; color:#9aa3bb; border-color:#39405a; }
+
+  #tooltip {
+    position: fixed;
+    background: #161b27;
+    border: 2px solid #e05c3a;
+    border-radius: 10px;
+    padding: 16px 18px;
+    max-width: 380px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.7);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #dde1ea;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip.validation { border-color: #7c5cff; }
+  #tooltip.validation .tt-num { background: #7c5cff; }
+  #tooltip.validation .tt-title { color: #b59dff; }
+  .tt-hyp { font-size: 12.5px; color: #b59dff; font-style: italic; }
+
+  .tt-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1e2330;
+  }
+  .tt-num {
+    background: #e05c3a;
+    color: #fff;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .tt-title { font-size: 14px; font-weight: 700; color: #ff8a6a; }
+  .tt-section { margin-bottom: 10px; }
+  .tt-section:last-child { margin-bottom: 0; }
+  .tt-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5a6280;
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .tt-body { font-size: 12.5px; color: #b0b8cc; }
+  .tt-fix { font-size: 12.5px; color: #90d090; }
+
+  .legend {
+    max-width: 1500px;
+    margin: 14px auto 0;
+    background: #13161e;
+    border: 1px solid #1e2330;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 12px;
+    color: #7a8299;
+  }
+  .legend-title { font-weight: 600; color: #dde1ea; margin-bottom: 10px; }
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-swatch {
+    width: 18px; height: 13px;
+    border-radius: 3px;
+    border: 2px solid;
+    flex-shrink: 0;
+  }
+
+  .blockers-summary {
+    max-width: 1500px;
+    margin: 14px auto 0;
+    background: #13161e;
+    border: 1px solid #1e2330;
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .blockers-summary h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #ff8a6a;
+  }
+  .blockers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 12px;
+  }
+  .blocker-card {
+    background: #161b27;
+    border-left: 3px solid #e05c3a;
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .blocker-card.ai-card { border-left-color: #38bdf8; }
+  .bc-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e05c3a;
+    margin-bottom: 3px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .bc-title { font-weight: 600; color: #dde1ea; font-size: 13px; margin-bottom: 4px; }
+  .bc-persona { font-size: 11px; color: #5a6280; margin-bottom: 6px; }
+  .bc-body { font-size: 12px; color: #8a93aa; line-height: 1.5; }
+  .bc-fix { font-size: 12px; color: #78b878; margin-top: 6px; line-height: 1.5; }
+  .bc-fix::before { content: "✓ "; font-weight: 700; }
+
+  .hint {
+    text-align: center;
+    color: #5a6280;
+    font-size: 11px;
+    margin-top: 10px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Attendance Correction Flow — Blockers & Solutions</h1>
+  <p class="subtitle">Clock-in → Anomaly detection (tiered) → Foreman correction → HR reconciliation → Pre-payroll AI summary → Export</p>
+  <div class="scenario-banner">
+    <strong>Context:</strong> Polish manufacturing SMB · 200+ workers · ~30% Ukrainian · End of shift: 3 workers missed clock-out · Monthly payroll cycle approaching
+  </div>
+  <div class="controls">
+    <button class="btn active" id="btn-tb" onclick="setDirection('TB')">Top → Bottom</button>
+    <button class="btn" id="btn-lr" onclick="setDirection('LR')">Left → Right</button>
+    <div class="persona-legend">
+      <div class="persona-item"><div class="persona-dot" style="background:#6b8aff"></div>Action node</div>
+      <div class="persona-item"><div class="persona-dot" style="background:#d4a056"></div>Decision</div>
+      <div class="persona-item"><div class="persona-dot" style="background:#38bdf8"></div>AI moment</div>
+      <div class="persona-item"><div class="persona-dot" style="background:#e05c3a"></div>Blocker</div>
+      <div class="persona-item"><div class="persona-dot" style="background:#5cb88a"></div>Success state</div>
+    </div>
+  </div>
+</header>
+
+<div class="diagram-wrap">
+  <div class="mermaid" id="mermaid-container">
+graph TB
+    Start([👷 Worker arrives on site]) --> ClockIn[👷 Clock-in<br/>QR · RFID · App]
+    ClockIn --> WorkShift[👷 Works shift<br/>System tracks elapsed time]
+    WorkShift --> D_CO{👷 Clocks out<br/>before leaving?}
+    D_CO -->|Yes| ClockOutOK[Clock-out recorded<br/>Timestamp locked ✓]
+    D_CO -->|No| MissedCO[/⚠️ Missed clock-out<br/>No record created<br/>Error propagates silently/]
+
+    ClockOutOK --> SysDetect
+    MissedCO -.->|silent error downstream| SysDetect
+
+    SysDetect[/🤖 AI Anomaly Detection · +30 min post-shift<br/>4 types: missing clock-out · missing clock-in<br/>implausible duration · unapproved OT<br/>Batched · tiered by confidence/]
+    SysDetect --> D_OT{Overtime<br/>pre-approved<br/>in system?}
+    D_OT -->|Yes| Excluded[✓ Excluded from flags<br/>Legitimate OT]
+    D_OT -->|No| D_Tier{AI confidence<br/>tier?}
+    D_Tier -->|High · actionable now| ForNotif
+    D_Tier -->|Low · review if time| HeldTier[/🤖 Held for HR pre-payroll summary<br/>'review if time allows'<br/>Foreman not nagged mid-shift/]
+
+    ForNotif[🔧 Foreman receives<br/>Shift Summary<br/>Batched · 30 min post-chaos]
+    ForNotif --> ForOpens[🔧 Opens flagged<br/>workers list<br/>📱 Mobile]
+    ForOpens --> AISuggest[/🤖 Suggested clock-out + confidence score<br/>Fixed-site default = RULE, not AI<br/>Score = inference over 4 signals:<br/>history · clock-in · OT flag · team pattern/]
+    AISuggest --> D_Conf{Confidence ≥ tunable<br/>threshold ~90%?<br/>conflicting signals → lower}
+    D_Conf -->|Yes| BulkOK[✓ Bulk approve<br/>available]
+    D_Conf -->|No · routed to human| ManualRev[🔧 Selects reason<br/>Pre-defined tap · no typing]
+    BulkOK --> Submit[🔧 Correction submitted<br/>24h SLA clock starts]
+    ManualRev --> Submit
+
+    Submit --> D_SLA{Foreman acts<br/>within 24h?}
+    D_SLA -->|Yes| HRDigest
+    D_SLA -->|No| Escalate[/🤖 Auto-escalation to HR<br/>with AI recommendation<br/>No manual chase/]
+    Escalate --> HRDigest
+
+    HRDigest[📋 HR receives daily digest<br/>Pending corrections count]
+    HRDigest --> HROpen[📋 Opens corrections dashboard<br/>All pending in one view]
+    HROpen --> ReviewCorr[📋 Reviews each correction<br/>AI reasoning trail visible<br/>Confidence + source shown]
+    ReviewCorr --> D_Ctx{Context<br/>sufficient<br/>to verify?}
+    D_Ctx -->|Yes| ApproveCorr[📋 Approves correction<br/>Audit trail locked]
+    D_Ctx -->|No context| ReturnFor[/⚠️ Returns to Foreman<br/>for clarification<br/>Loop · deadline risk/]
+    ReturnFor -.->|Foreman responds| ApproveCorr
+
+    ApproveCorr --> PrePayroll[📋 Opens pre-payroll report<br/>End of period]
+    HeldTier -.->|rolled into summary| AISumm
+    PrePayroll --> AISumm[/🤖 HERO · AI pre-payroll summary<br/>Synthesis of anomalies · OT patterns<br/>Night premiums · held low-confidence flags<br/>Audit-defensibility first, speed second/]
+    AISumm --> HRSumm[📋 HR reviews AI summary<br/>Every flag + money claim expandable to<br/>workers · hours · rate · legal rule<br/>Ack requires calculation shown]
+    HRSumm --> PreExport[📋 Pre-export validation<br/>All flags must be acknowledged<br/>before export unlocks]
+    PreExport --> D_Flags{All flags<br/>acknowledged?}
+    D_Flags -->|No| AckFlags[📋 HR acknowledges<br/>each remaining flag]
+    AckFlags --> D_Flags
+    D_Flags -->|Yes| ExportRep[📋 Exports to<br/>Optima · enova365<br/>Pre-built format]
+
+    ExportRep --> PRec[💰 Payroll Admin receives<br/>compliance-ready report]
+    PRec --> PVerify[💰 Verifies ZUS rules<br/>Overtime · Night premium<br/>Compliance check]
+    PVerify --> D_Comp{Compliance<br/>issues found?}
+    D_Comp -->|Yes| ReturnHR[/⚠️ Returns to HR<br/>correction needed/]
+    ReturnHR -.->|fix and re-export| PrePayroll
+    D_Comp -->|Clean| PayRun[💰 Runs payroll<br/>Optima · enova365]
+    PayRun --> End([✅ Payroll complete<br/>Workers paid correctly])
+
+    classDef screen fill:#1e2640,stroke:#6b8aff,stroke-width:2px,color:#dde1ea
+    classDef decision fill:#2a2010,stroke:#d4a056,stroke-width:2px,color:#dde1ea
+    classDef blocker fill:#2a1208,stroke:#e05c3a,stroke-width:2px,color:#dde1ea
+    classDef success fill:#112218,stroke:#5cb88a,stroke-width:2px,color:#dde1ea
+    classDef ai fill:#0d1f28,stroke:#38bdf8,stroke-width:2px,color:#b0e0f8,stroke-dasharray:5 3
+    classDef system fill:#161a22,stroke:#5a6280,stroke-width:1px,color:#8a93aa,stroke-dasharray:4 4
+    classDef startend fill:#112218,stroke:#5cb88a,stroke-width:3px,color:#dde1ea
+
+    class ClockIn,WorkShift,ForNotif,ForOpens,ManualRev,Submit,HRDigest,HROpen,ReviewCorr,ApproveCorr,PrePayroll,HRSumm,PreExport,AckFlags,ExportRep,PRec,PVerify,PayRun screen
+    class D_CO,D_OT,D_Conf,D_SLA,D_Ctx,D_Flags,D_Comp decision
+    class MissedCO,ReturnFor,ReturnHR blocker
+    class ClockOutOK,Excluded,BulkOK,AckFlags success
+    class SysDetect,AISuggest,AISumm,Escalate,HeldTier ai
+    class D_Tier decision
+    class Start,End startend
+
+    classDef validation stroke:#7c5cff,stroke-width:2.5px
+    class MissedCO,SysDetect,D_Tier,AISuggest,ManualRev,D_SLA,HRSumm,ExportRep validation
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<div class="legend">
+  <div class="legend-title">Legend</div>
+  <div class="legend-grid">
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#1e2640;border-color:#6b8aff"></span>
+      Action node (persona)
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#2a2010;border-color:#d4a056"></span>
+      Decision / branch
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#0d1f28;border-color:#38bdf8;border-style:dashed"></span>
+      🤖 AI moment
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#2a1208;border-color:#e05c3a;box-shadow:0 0 5px rgba(224,92,58,0.4)"></span>
+      ⚠️ Blocker (hover for details)
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#1a1430;border-color:#7c5cff;border-style:dashed"></span>
+      <span style="display:inline-flex;align-items:center;gap:6px"><span style="background:#7c5cff;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px">V</span>Validation point (hover — assumption + hypothesis)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#112218;border-color:#5cb88a"></span>
+      Success / clean state
+    </div>
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:#161a22;border-color:#5a6280;border-style:dashed"></span>
+      System / background
+    </div>
+  </div>
+  <div class="legend-title" style="margin-top:14px">Tag pills — persona &amp; device</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <span class="pill pill-worker">Worker</span>
+    <span class="pill pill-foreman">Foreman</span>
+    <span class="pill pill-hr">HR</span>
+    <span class="pill pill-payroll">Payroll</span>
+    <span class="pill pill-system">AI</span>
+    <span style="width:1px;height:16px;background:#1e2330;margin:0 4px"></span>
+    <span class="pill pill-dev">🎟️ QR/RFID</span>
+    <span class="pill pill-dev">📱 Mobile</span>
+    <span class="pill pill-dev">🖥️ Desktop</span>
+    <span class="pill pill-dev">⚙️ System</span>
+    <span class="pill pill-dev">🏭 On-site</span>
+  </div>
+</div>
+
+<div class="blockers-summary">
+  <h2>⚠️ 8 blockers identified across Foreman + HR Manager flows</h2>
+  <div class="blockers-grid">
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 1 · Worker</div>
+      <div class="bc-title">Missed clock-out propagates silently</div>
+      <div class="bc-persona">👷 Worker → 🔧 Foreman → 📋 HR → 💰 Payroll</div>
+      <div class="bc-body">No record is created. Error travels downstream invisibly until it surfaces pre-payroll — when fixing it costs the most time.</div>
+      <div class="bc-fix">System timer detects missed clock-out after shift hours exceeded. Batches into Foreman summary. Phase 2: geofence exit notification.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 2 · Foreman</div>
+      <div class="bc-title">Notification at worst possible moment</div>
+      <div class="bc-persona">🔧 Foreman — end of shift</div>
+      <div class="bc-body">Traditional: alert fires at shift end — during handover, safety checks, equipment shutdown. Notification ignored in factory floor noise.</div>
+      <div class="bc-fix">Delay notification 30 min post-shift. Batch ALL anomalies into one shift summary. Foreman acts post-chaos, not mid-chaos.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 3 · Foreman</div>
+      <div class="bc-title">Factory floor connectivity + app friction</div>
+      <div class="bc-persona">🔧 Foreman — mobile on factory floor</div>
+      <div class="bc-body">WiFi dead zones. App on personal phone. Complex UI = abandoned process. One thumb free at best.</div>
+      <div class="bc-fix">Offline-capable mobile UI. Critical path = one notification → one list → single-tap action. No multi-step navigation.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 4 · Foreman</div>
+      <div class="bc-title">Knowledge gap — Foreman approves blind</div>
+      <div class="bc-persona">🔧 Foreman — manual correction review</div>
+      <div class="bc-body">Managed 20 workers, not one. Doesn't know exact departure times. May rubber-stamp AI suggestions or skip entirely. 5+ anomalies = abandoned.</div>
+      <div class="bc-fix">AI confidence score signals when auto-approve is safe vs. when real review needed. Pre-defined tap reasons — zero typing on floor.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 5 · HR</div>
+      <div class="bc-title">HR approves corrections blind — legal risk</div>
+      <div class="bc-persona">📋 HR Manager — corrections dashboard</div>
+      <div class="bc-body">Foreman skipped notes. HR sees AI suggestion with no context. Approving = signing off legally. Wrong correction → PIP audit liability.</div>
+      <div class="bc-fix">AI reasoning trail: "Suggested 16:00 — matches shift schedule, 94% historical match." HR acknowledges reasoning explicitly, not just clicks approve.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 6 · HR</div>
+      <div class="bc-title">AI numbers can't be defended at PIP audit</div>
+      <div class="bc-persona">📋 HR Manager — pre-payroll AI summary</div>
+      <div class="bc-body">"The system calculated it" is not a legal defense. HR is personally liable for compliance accuracy under Polish labor law.</div>
+      <div class="bc-fix">Every flag expandable to source data + calculation. Compliance-ready audit log auto-generated. HR must acknowledge each flag before export unlocks.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 7 · HR</div>
+      <div class="bc-title">Return-to-Foreman creates unresolved loop</div>
+      <div class="bc-persona">📋 HR → 🔧 Foreman — clarification loop</div>
+      <div class="bc-body">Foreman is running next shift. Doesn't respond quickly. Correction sits unresolved. Payroll deadline approaching. HR stuck: approve blind or hold payroll.</div>
+      <div class="bc-fix">24h SLA on corrections. After deadline: auto-escalation with AI recommendation. HR approves with documented note. No manual chase.</div>
+    </div>
+    <div class="blocker-card">
+      <div class="bc-num">Blocker 8 · HR + Payroll</div>
+      <div class="bc-title">Export errors surface at worst moment</div>
+      <div class="bc-persona">📋 HR → 💰 Payroll Admin — export</div>
+      <div class="bc-body">Payroll Admin finds format issues or missing data after receiving the export. Payroll run is imminent. Correction loop back to HR under maximum pressure.</div>
+      <div class="bc-fix">Pre-built Optima/enova365 export format (PF structural moat). Pre-export validation: all flags acknowledged before export button unlocks.</div>
+    </div>
+  </div>
+</div>
+
+<div class="blockers-summary">
+  <h2 style="color:#8ab4f8">🤖 AI Solution Canvas — 3 inferential features (rules elsewhere)</h2>
+  <div class="blockers-grid">
+    <div class="blocker-card ai-card">
+      <div class="bc-num" style="color:#38bdf8">Feature 1 · Confidence Score</div>
+      <div class="bc-title">When to bulk-approve vs. inspect</div>
+      <div class="bc-persona">🤖 Foreman correction · Screen 2</div>
+      <div class="bc-body">Fixed-site suggested time is a deterministic RULE. The inference is the score — over 4 signals: worker history, that-day clock-in, pre-approved OT flag, team pattern. Seeded by historical import at onboarding (no cold start).</div>
+      <div class="bc-fix">Conflicting signals → lower score → routed to human. Threshold customer-tunable but every change logged (who/when) for audit defensibility. False high-confidence is the expensive failure — model biases conservative.</div>
+    </div>
+    <div class="blocker-card ai-card">
+      <div class="bc-num" style="color:#38bdf8">Feature 2 · Anomaly Detection</div>
+      <div class="bc-title">Who reaches the flagged list</div>
+      <div class="bc-persona">🤖 +30 min post-shift · Screen 1</div>
+      <div class="bc-body">Flags 4 types: missing clock-out, missing clock-in, implausible duration, unapproved OT. Over-flag kills adoption; under-flag misses real gaps.</div>
+      <div class="bc-fix">Two-speed by confidence: high → Foreman now; low → held, rolled into HR pre-payroll summary as 'review if time allows'. Nothing dropped; each anomaly lands at the right desk. Foreman tier learns within 24h, HR tier at period-end.</div>
+    </div>
+    <div class="blocker-card ai-card">
+      <div class="bc-num" style="color:#38bdf8">Feature 3 · Pre-payroll Summary · HERO</div>
+      <div class="bc-title">Synthesis &amp; audit-defensibility</div>
+      <div class="bc-persona">🤖 HR pre-payroll · Screen 4</div>
+      <div class="bc-body">Hundreds of events → a handful of acknowledged, audit-ready flags that unlock export. Ranked job: defensibility is the floor, speed optimized on top — never at its expense.</div>
+      <div class="bc-fix">Every flag + money claim (e.g. night premium PLN 847) expandable to workers · hours · rate · legal rule. Acknowledgement requires the calculation was shown. Export locked until done. Danger isn't a wrong number — it's unexamined sign-off.</div>
+    </div>
+  </div>
+  <p style="margin-top:14px;font-size:12.5px;color:#b0b8cc;line-height:1.6;border-top:1px solid #1e2330;padding-top:12px"><strong style="color:#8ab4f8">Design spine:</strong> every AI feature is calibrated to make <em>false high-confidence</em> the most expensive failure — then engineered to avoid it. F1 routes ambiguity to a human, F2 routes uncertain anomalies to the right desk, F3 gates acknowledgement on shown calculation. The system never optimizes for AI being right most often — it optimizes for AI being never confidently wrong in a way a human rubber-stamps. Final approval is never AI. Permit / right-to-work validation moved to the compliance layer, out of this flow.</p>
+</div>
+
+<div class="blockers-summary">
+  <h2 style="color:#b59dff">🔮 8 validation points — unvalidated assumptions + hypotheses to test</h2>
+  <p style="font-size:12px;color:#8a93aa;margin-bottom:14px">Each ‘V’ badge marks a place where the design rests on an assumption we have not yet validated. Ordered by de-risk priority — V1 and V4 are the riskiest (they can invalidate the whole problem or the AI).</p>
+  <div class="blockers-grid">
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V1 · MissedCO · riskiest</div>
+      <div class="bc-title">Is missed clock-out the core problem?</div>
+      <div class="bc-persona">Problem-level assumption</div>
+      <div class="bc-body">We assume missed clock-outs are frequent enough to justify the whole correction layer — not a rare edge case dwarfed by leave/contract disputes.</div>
+      <div class="bc-fix" style="color:#b59dff">H: missed clock-outs ≥40% of corrections. Data audit + Foreman diary (3 sites, 2 wks). Disconfirm → problem selection wrong.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V4 · AISuggest · riskiest</div>
+      <div class="bc-title">Is the confidence score trustworthy?</div>
+      <div class="bc-persona">AI calibration assumption</div>
+      <div class="bc-body">We assume schedule + 4 signals produce a calibrated, defensible score. Calibration is unproven — and a confidently-wrong score is the expensive failure.</div>
+      <div class="bc-fix" style="color:#b59dff">H: ≥90%-confidence corrections right ≥95%. Backtest on import data + worker confirmation. Disconfirm → raise threshold / change signals.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V3 · D_Tier</div>
+      <div class="bc-title">Will Foremen trust the two-speed split?</div>
+      <div class="bc-persona">Adoption assumption</div>
+      <div class="bc-body">We assume Foremen bulk-approve high-confidence flags without inspecting each — the mechanism the adoption case rests on.</div>
+      <div class="bc-fix" style="color:#b59dff">H: bulk-approve in ≤2 min, no later distrust. Moderated task + trust interview. Disconfirm → time-saving collapses.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V7 · HRSumm</div>
+      <div class="bc-title">Does the audit trail create real confidence?</div>
+      <div class="bc-persona">Trust assumption</div>
+      <div class="bc-body">We assume expandable calculation makes HR feel confident to sign off — vs. still exposed, or just rubber-stamping.</div>
+      <div class="bc-fix" style="color:#b59dff">H: higher self-reported confidence + genuine expand-before-ack. Comparative test + click-depth logging. Disconfirm → trust is fake.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V6 · D_SLA</div>
+      <div class="bc-title">Is a 24h SLA realistic?</div>
+      <div class="bc-persona">Process assumption</div>
+      <div class="bc-body">We assume a Foreman running the next shift resolves corrections within 24h without constant escalation.</div>
+      <div class="bc-fix" style="color:#b59dff">H: ≥70% resolved in 24h without escalation. Pilot SLA tracking. Disconfirm → SLA is theater, redesign handoff.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V2 · SysDetect</div>
+      <div class="bc-title">Is +30 min the right delay?</div>
+      <div class="bc-persona">Timing assumption</div>
+      <div class="bc-body">We assume 30 min post-shift lets the Foreman act post-chaos. Could be too soon (still busy) or too late (gone home).</div>
+      <div class="bc-fix" style="color:#b59dff">H: ≥3 of 5 act on a 30-min batch same evening. Timing A/B (0/30/60). Disconfirm → format is the lever, not timing.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V5 · ManualRev</div>
+      <div class="bc-title">Do tap reasons cover reality?</div>
+      <div class="bc-persona">Taxonomy assumption</div>
+      <div class="bc-body">We assume the fixed reason set covers real causes — so no typing is ever needed on the floor.</div>
+      <div class="bc-fix" style="color:#b59dff">H: fixed reasons cover ≥85%, <15% need free-text. Pilot reason-frequency log. Disconfirm → taxonomy wrong, HR loses context.</div>
+    </div>
+    <div class="blocker-card" style="border-left-color:#7c5cff">
+      <div class="bc-num" style="color:#b59dff">V8 · ExportRep</div>
+      <div class="bc-title">Does pre-built format kill export errors?</div>
+      <div class="bc-persona">Integration assumption</div>
+      <div class="bc-body">We assume the pre-built Optima/enova365 format + validation means zero payroll-admin errors. Real-world edge cases untested.</div>
+      <div class="bc-fix" style="color:#b59dff">H: ≥95% of exports pass first time. Pilot round-trip count (3 sites). Disconfirm → validation rules incomplete.</div>
+    </div>
+  </div>
+</div>
+
+<p class="hint">Hover orange-outlined nodes for blockers · 🤖 teal-dashed nodes = AI intervention points · purple <strong style="color:#b59dff">V</strong> badges = validation points (hover for assumption + hypothesis).</p>
+
+<script>
+const problems = {
+  1: {
+    title: "Missed clock-out propagates silently",
+    where: "Worker leaves without clocking out → downstream flow",
+    why: "No record is created. Error travels invisibly through Foreman → HR → Payroll. Discovered only at pre-payroll when fixing it costs the most.",
+    fix: "System timer detects missed clock-out (shift hours exceeded + no record). Batches into Foreman shift summary. Phase 2: geofence exit notification via worker app."
+  },
+  2: {
+    title: "Notification at worst possible moment",
+    where: "End of shift → Foreman receives alert",
+    why: "Alert fires exactly when Foreman manages handover, equipment shutdown, safety checks. Factory floor noise. Notification missed or ignored.",
+    fix: "Delay notification 30 min after shift end. Batch ALL anomalies into ONE shift summary. Foreman deals with it post-chaos, not mid-chaos."
+  },
+  3: {
+    title: "Factory floor connectivity + app friction",
+    where: "Foreman opens flagged list on mobile",
+    why: "Warehouses and factory floors have WiFi dead zones. App on personal phone requires install. Complex UI = process abandoned after 2nd worker.",
+    fix: "Lightweight offline-capable mobile UI. Critical path: one notification → one list → single-tap confirm. No multi-step navigation required."
+  },
+  4: {
+    title: "Knowledge gap — Foreman approves blind",
+    where: "Manual correction review, low-confidence AI cases",
+    why: "Foreman managed 20+ workers, not one. Doesn't know exact departure times. Rubber-stamps AI suggestions or skips. 5+ anomalies = process abandoned.",
+    fix: "AI confidence score signals when auto-approve is safe. Pre-defined tap reasons replace free text. Zero typing on factory floor required."
+  },
+  5: {
+    title: "HR approves corrections blind — legal risk",
+    where: "HR corrections dashboard",
+    why: "Foreman skipped notes (always). HR sees only an AI suggestion with no context. Approving = legal sign-off. Wrong correction → PIP audit → HR liable.",
+    fix: "AI reasoning trail visible: 'Suggested 16:00 — matches shift schedule 08:00–16:00. 94% historical accuracy.' HR acknowledges reasoning, not just clicks approve."
+  },
+  6: {
+    title: "AI numbers can't be defended at PIP audit",
+    where: "HR reviews pre-payroll AI summary",
+    why: "'The system calculated it' is not a legal defense under Polish labor law. HR personally liable for night premium and overtime accuracy.",
+    fix: "Every AI flag expandable to source data + exact calculation. Compliance-ready audit log auto-generated per correction. HR acknowledges each flag — export blocked until done."
+  },
+  7: {
+    title: "Return-to-Foreman creates unresolved loop",
+    where: "HR → returns correction to Foreman",
+    why: "Foreman is already running the next shift. Doesn't check HR requests quickly. Correction stays unresolved. Payroll deadline approaching. HR: approve blind or block payroll.",
+    fix: "24h SLA auto-enforced. After deadline: auto-escalation with AI recommendation. HR approves with documented note. No manual chase required."
+  },
+  8: {
+    title: "Export errors surface at worst moment",
+    where: "HR exports to Optima / enova365",
+    why: "Payroll Admin finds format incompatibilities or missing fields after receiving the export. Payroll run is imminent. Correction loop fires under maximum time pressure.",
+    fix: "Pre-built Optima/enova365 export format (PeopleForce moat). Pre-export validation check: all flags acknowledged before export button unlocks."
+  }
+};
+
+const nodeProblems = {
+  'MissedCO': 1,
+  'ForNotif': 2,
+  'ForOpens': 3,
+  'ManualRev': 4,
+  'ReviewCorr': 5,
+  'HRSumm': 6,
+  'ReturnFor': 7,
+  'ExportRep': 8
+};
+
+// Validation / ambiguity points — unvalidated assumptions needing user research
+const validations = {
+  1: {
+    title: "Is missed clock-out actually the core problem?",
+    assume: "We assume missed clock-outs are frequent enough to justify building the whole correction layer around them — not a rare edge case dwarfed by leave/sick-day disputes.",
+    hyp: "H: Missed clock-outs are ≥40% of all attendance corrections. Test: 2 weeks of correction-log data from 3 design-partner sites. Disconfirm: if leave/contract issues dominate, the problem selection is wrong.",
+    method: "Data audit + Foreman diary study (5 Foremen, 5 shifts)"
+  },
+  2: {
+    title: "Is +30 min the right notification delay?",
+    assume: "We assume delaying the shift summary 30 min post-shift lets the Foreman act post-chaos. Could be too soon (still busy) or too late (gone home).",
+    hyp: "H: ≥3 of 5 Foremen act on a 30-min-delayed batch within the same evening. Test: prototype notification timing A/B (0 / 30 / 60 min). Disconfirm: if engagement is flat across delays, timing isn't the lever — format is.",
+    method: "Notification-timing usability test, 5–8 Foremen"
+  },
+  3: {
+    title: "Will Foremen trust a two-speed confidence split?",
+    assume: "We assume Foremen accept 'bulk approve' for high-confidence flags without inspecting each one — the mechanism the whole adoption case rests on.",
+    hyp: "H: Foremen bulk-approve high-confidence batches in ≥2 min AND don't later report distrust of the auto-grouping. Test: moderated prototype task. Disconfirm: if they re-open every item anyway, the time-saving collapses.",
+    method: "Moderated task + post-task trust interview"
+  },
+  4: {
+    title: "Is the confidence score actually trustworthy?",
+    assume: "We assume schedule default + 4 signals (history, clock-in, OT flag, team pattern) produces a calibrated, defensible score. Calibration is unproven.",
+    hyp: "H: corrections scored ≥90% confidence match worker-confirmed truth ≥95% of the time. Test: backtest scores against historical-import data + worker confirmation sample. Disconfirm: if high scores are wrong >5%, threshold must rise or signals change.",
+    method: "Quant backtest on import data + worker confirmation"
+  },
+  5: {
+    title: "Do pre-defined tap reasons cover reality?",
+    assume: "We assume the fixed reason set ('schedule default / worker confirmed / dispute pending') covers real correction causes — so no typing is ever needed on the floor.",
+    hyp: "H: the fixed reasons cover ≥85% of real corrections; <15% need free-text. Test: log reason selection + 'other' rate in pilot. Disconfirm: high 'other' rate means the taxonomy is wrong and HR loses context.",
+    method: "Pilot reason-frequency log + Foreman interviews"
+  },
+  6: {
+    title: "Is a 24h SLA realistic for a busy Foreman?",
+    assume: "We assume a Foreman running the next shift can resolve corrections within 24h without constant escalation. Could be wildly optimistic.",
+    hyp: "H: ≥70% of corrections resolved within 24h without escalation. Test: pilot SLA-adherence tracking. Disconfirm: if most escalate, the SLA is theater and HR carries the load anyway — redesign the handoff.",
+    method: "Pilot SLA tracking + escalation-rate analysis"
+  },
+  7: {
+    title: "Does expandable calculation create real audit confidence?",
+    assume: "We assume making every flag expandable to source + calculation makes HR feel confident enough to sign off — vs. still feeling exposed or just rubber-stamping.",
+    hyp: "H: HR self-reports higher approval confidence with the audit trail vs. without, AND reason-attach engagement is genuine (expands before acknowledging). Test: comparative prototype + behavioral logging. Disconfirm: if they 'acknowledge all' without expanding, trust is fake.",
+    method: "Comparative usability test, 5 HR managers + click-depth logging"
+  },
+  8: {
+    title: "Does pre-built format really eliminate export errors?",
+    assume: "We assume the pre-built Optima/enova365 format + pre-export validation means payroll admin finds zero errors. The integration's real-world edge cases are untested.",
+    hyp: "H: ≥95% of exports pass the payroll admin's check first time. Test: pilot export runs across 3 sites, count round-trips. Disconfirm: if admins still bounce exports, the validation rules are incomplete.",
+    method: "Pilot export round-trip count + payroll admin interviews"
+  }
+};
+
+// node -> validation id
+const nodeValidations = {
+  'MissedCO': 1,
+  'SysDetect': 2,
+  'D_Tier': 3,
+  'AISuggest': 4,
+  'ManualRev': 5,
+  'D_SLA': 6,
+  'HRSumm': 7,
+  'ExportRep': 8
+};
+
+// persona + device tag pills per node
+// persona: worker | foreman | hr | payroll | system
+// device: 'QR/RFID' | 'Mobile' | 'Desktop' | 'System' | '' (none)
+const nodeTags = {
+  Start:       { p:['worker','Worker'],   d:'' },
+  ClockIn:     { p:['worker','Worker'],   d:'QR/RFID' },
+  WorkShift:   { p:['worker','Worker'],   d:'On-site' },
+  D_CO:        { p:['worker','Worker'],   d:'QR/RFID' },
+  ClockOutOK:  { p:['system','System'],   d:'System' },
+  MissedCO:    { p:['system','System'],   d:'System' },
+  SysDetect:   { p:['system','AI'],       d:'System' },
+  D_OT:        { p:['system','System'],   d:'System' },
+  D_Tier:      { p:['system','AI'],       d:'System' },
+  HeldTier:    { p:['system','AI'],       d:'System' },
+  ForNotif:    { p:['foreman','Foreman'], d:'Mobile' },
+  ForOpens:    { p:['foreman','Foreman'], d:'Mobile' },
+  AISuggest:   { p:['system','AI'],       d:'Mobile' },
+  D_Conf:      { p:['system','AI'],       d:'Mobile' },
+  BulkOK:      { p:['foreman','Foreman'], d:'Mobile' },
+  ManualRev:   { p:['foreman','Foreman'], d:'Mobile' },
+  Submit:      { p:['foreman','Foreman'], d:'Mobile' },
+  D_SLA:       { p:['system','System'],   d:'System' },
+  Escalate:    { p:['system','AI'],       d:'System' },
+  HRDigest:    { p:['hr','HR'],           d:'Desktop' },
+  HROpen:      { p:['hr','HR'],           d:'Desktop' },
+  ReviewCorr:  { p:['hr','HR'],           d:'Desktop' },
+  D_Ctx:       { p:['hr','HR'],           d:'Desktop' },
+  ApproveCorr: { p:['hr','HR'],           d:'Desktop' },
+  ReturnFor:   { p:['hr','HR'],           d:'Desktop' },
+  PrePayroll:  { p:['hr','HR'],           d:'Desktop' },
+  AISumm:      { p:['system','AI'],       d:'Desktop' },
+  HRSumm:      { p:['hr','HR'],           d:'Desktop' },
+  PreExport:   { p:['hr','HR'],           d:'Desktop' },
+  D_Flags:     { p:['hr','HR'],           d:'Desktop' },
+  AckFlags:    { p:['hr','HR'],           d:'Desktop' },
+  ExportRep:   { p:['hr','HR'],           d:'Desktop' },
+  PRec:        { p:['payroll','Payroll'], d:'Desktop' },
+  PVerify:     { p:['payroll','Payroll'], d:'Desktop' },
+  D_Comp:      { p:['payroll','Payroll'], d:'Desktop' },
+  ReturnHR:    { p:['payroll','Payroll'], d:'Desktop' },
+  PayRun:      { p:['payroll','Payroll'], d:'Desktop' },
+  End:         { p:['worker','Worker'],   d:'' }
+};
+
+const devIcon = { 'QR/RFID':'🎟️','Mobile':'📱','Desktop':'🖥️','System':'⚙️','On-site':'🏭' };
+
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'base',
+  themeVariables: {
+    background: '#13161e',
+    primaryColor: '#1e2640',
+    primaryTextColor: '#dde1ea',
+    primaryBorderColor: '#6b8aff',
+    lineColor: '#4a5470',
+    secondaryColor: '#2a2010',
+    tertiaryColor: '#0d1f28',
+    fontSize: '13px'
+  },
+  flowchart: {
+    curve: 'basis',
+    padding: 22,
+    nodeSpacing: 50,
+    rankSpacing: 55
+  }
+});
+
+const container = document.getElementById('mermaid-container');
+const originalSource = container.textContent;
+const tooltip = document.getElementById('tooltip');
+
+async function annotateBlockers() {
+  await new Promise(resolve => setTimeout(resolve, 400));
+  const svg = container.querySelector('svg');
+  if (!svg) { setTimeout(annotateBlockers, 200); return; }
+
+  const allNodes = svg.querySelectorAll('g.node');
+
+  allNodes.forEach(node => {
+    const id = node.id || '';
+    let matchedKey = null;
+    for (const key of Object.keys(nodeProblems)) {
+      if (id.includes(`-${key}-`) || id.endsWith(`-${key}`)) {
+        matchedKey = key; break;
+      }
+    }
+    if (!matchedKey) return;
+
+    const problemNum = nodeProblems[matchedKey];
+    node.classList.add('blocker-node');
+    node.dataset.problem = problemNum;
+
+    node.addEventListener('mouseenter', (e) => showTooltip(e, problemNum));
+    node.addEventListener('mousemove', moveTooltip);
+    node.addEventListener('mouseleave', hideTooltip);
+
+    const bbox = node.getBoundingClientRect();
+    const wrapEl = document.querySelector('.diagram-wrap');
+    const wrapBbox = wrapEl.getBoundingClientRect();
+
+    const badge = document.createElement('div');
+    badge.className = 'problem-badge';
+    badge.textContent = problemNum;
+    badge.style.left = (bbox.left - wrapBbox.left + wrapEl.scrollLeft + bbox.width - 12) + 'px';
+    badge.style.top = (bbox.top - wrapBbox.top + wrapEl.scrollTop - 9) + 'px';
+    wrapEl.appendChild(badge);
+  });
+}
+
+function renderTagPills() {
+  const svg = container.querySelector('svg');
+  if (!svg) return;
+  const wrapEl = document.querySelector('.diagram-wrap');
+  const wrapBbox = wrapEl.getBoundingClientRect();
+  const allNodes = svg.querySelectorAll('g.node');
+
+  allNodes.forEach(node => {
+    const id = node.id || '';
+    let key = null;
+    for (const k of Object.keys(nodeTags)) {
+      if (id.includes(`-${k}-`) || id.endsWith(`-${k}`)) { key = k; break; }
+    }
+    if (!key) return;
+    const t = nodeTags[key];
+    const bbox = node.getBoundingClientRect();
+
+    const holder = document.createElement('div');
+    holder.className = 'tag-pills';
+    // persona pill
+    const personaPill = document.createElement('span');
+    personaPill.className = 'pill pill-' + t.p[0];
+    personaPill.textContent = t.p[1];
+    holder.appendChild(personaPill);
+    // device pill (skip when none)
+    if (t.d) {
+      const devPill = document.createElement('span');
+      devPill.className = 'pill pill-dev';
+      devPill.textContent = (devIcon[t.d] || '') + ' ' + t.d;
+      holder.appendChild(devPill);
+    }
+    wrapEl.appendChild(holder);
+    // position: anchored above the node, left-aligned to node left edge
+    const ph = holder.getBoundingClientRect();
+    let left = bbox.left - wrapBbox.left + wrapEl.scrollLeft;
+    const top = bbox.top - wrapBbox.top + wrapEl.scrollTop - 6;
+    // keep within diagram bounds
+    if (left < 4) left = 4;
+    holder.style.left = left + 'px';
+    holder.style.top = top + 'px';
+  });
+}
+
+function renderValidationBadges() {
+  const svg = container.querySelector('svg');
+  if (!svg) return;
+  const wrapEl = document.querySelector('.diagram-wrap');
+  const wrapBbox = wrapEl.getBoundingClientRect();
+  const allNodes = svg.querySelectorAll('g.node');
+
+  allNodes.forEach(node => {
+    const id = node.id || '';
+    let key = null;
+    for (const k of Object.keys(nodeValidations)) {
+      if (id.includes(`-${k}-`) || id.endsWith(`-${k}`)) { key = k; break; }
+    }
+    if (!key) return;
+    const vid = nodeValidations[key];
+    const bbox = node.getBoundingClientRect();
+
+    const badge = document.createElement('div');
+    badge.className = 'validation-badge';
+    badge.textContent = 'V' + vid;
+    // bottom-left of the node (pills are top-left, blocker badge is top-right)
+    badge.style.left = (bbox.left - wrapBbox.left + wrapEl.scrollLeft - 6) + 'px';
+    badge.style.top = (bbox.top - wrapBbox.top + wrapEl.scrollTop + bbox.height - 14) + 'px';
+
+    badge.addEventListener('mouseenter', (e) => showValidationTooltip(e, vid));
+    badge.addEventListener('mousemove', moveTooltip);
+    badge.addEventListener('mouseleave', hideTooltip);
+    wrapEl.appendChild(badge);
+  });
+}
+
+function showValidationTooltip(e, vid) {
+  const v = validations[vid];
+  tooltip.classList.add('validation');
+  tooltip.innerHTML = `
+    <div class="tt-header">
+      <div class="tt-num">V${vid}</div>
+      <div class="tt-title">${v.title}</div>
+    </div>
+    <div class="tt-section">
+      <div class="tt-label">Assumption (ambiguity)</div>
+      <div class="tt-body">${v.assume}</div>
+    </div>
+    <div class="tt-section">
+      <div class="tt-label">Hypothesis to validate</div>
+      <div class="tt-hyp">${v.hyp}</div>
+    </div>
+    <div class="tt-section">
+      <div class="tt-label">Research method</div>
+      <div class="tt-body">${v.method}</div>
+    </div>
+  `;
+  tooltip.classList.add('visible');
+  moveTooltip(e);
+}
+
+function showTooltip(e, num) {
+  tooltip.classList.remove('validation');
+  const p = problems[num];
+  tooltip.innerHTML = `
+    <div class="tt-header">
+      <div class="tt-num">${num}</div>
+      <div class="tt-title">${p.title}</div>
+    </div>
+    <div class="tt-section">
+      <div class="tt-label">Where</div>
+      <div class="tt-body">${p.where}</div>
+    </div>
+    <div class="tt-section">
+      <div class="tt-label">Why it blocks</div>
+      <div class="tt-body">${p.why}</div>
+    </div>
+    <div class="tt-section">
+      <div class="tt-label">Solution</div>
+      <div class="tt-fix">${p.fix}</div>
+    </div>
+  `;
+  tooltip.classList.add('visible');
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const ttRect = tooltip.getBoundingClientRect();
+  const pad = 14;
+  let x = e.clientX + 16, y = e.clientY + 16;
+  if (x + ttRect.width > window.innerWidth - pad) x = e.clientX - ttRect.width - 16;
+  if (y + ttRect.height > window.innerHeight - pad) y = e.clientY - ttRect.height - 16;
+  if (y < pad) y = pad;
+  if (x < pad) x = pad;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideTooltip() { tooltip.classList.remove('visible'); }
+
+function clearBadges() {
+  document.querySelectorAll('.problem-badge').forEach(b => b.remove());
+  document.querySelectorAll('.tag-pills').forEach(p => p.remove());
+  document.querySelectorAll('.validation-badge').forEach(v => v.remove());
+}
+
+function setDirection(dir) {
+  document.getElementById('btn-tb').classList.toggle('active', dir === 'TB');
+  document.getElementById('btn-lr').classList.toggle('active', dir === 'LR');
+  clearBadges();
+  let src = originalSource.replace(/graph (TB|LR)/, `graph ${dir}`);
+  container.removeAttribute('data-processed');
+  container.innerHTML = src;
+  mermaid.init(undefined, container).then(() => { annotateBlockers(); renderTagPills(); renderValidationBadges(); });
+}
+
+window.addEventListener('load', () => setTimeout(() => { annotateBlockers(); renderTagPills(); renderValidationBadges(); }, 600));
+
+const wrap = document.querySelector('.diagram-wrap');
+wrap.addEventListener('scroll', () => { clearBadges(); annotateBlockers(); renderTagPills(); renderValidationBadges(); });
+window.addEventListener('resize', () => { clearBadges(); setTimeout(() => { annotateBlockers(); renderTagPills(); renderValidationBadges(); }, 100); });
+</script>
+</body>
+</html>

@@ -20,77 +20,80 @@ export default function SlideLayout({
       <div style={{
         width: '100%',
         maxWidth: fullBleed ? '100%' : 1160,
-        padding: fullBleed ? 0 : '56px 64px 64px',
+        padding: fullBleed ? '56px 0 0 0' : '56px 64px 64px',
         display: 'flex',
         flexDirection: 'column',
         flex: verticalCenter ? undefined : 1,
       }}>
-        {/* Section label */}
-        {sectionNumber && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            marginBottom: 20,
-          }}>
-            <span style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: 'var(--accent)',
-              letterSpacing: 1.2,
-              textTransform: 'uppercase',
-              fontVariantNumeric: 'tabular-nums',
-            }}>
-              {String(sectionNumber).padStart(2, '0')}
-            </span>
+        {/* Header Block with conditional padding for fullBleed */}
+        <div style={{ padding: fullBleed ? '0 64px' : 0 }}>
+          {/* Section label */}
+          {sectionNumber && (
             <div style={{
-              width: 24,
-              height: 1.5,
-              background: 'var(--accent)',
-              opacity: 0.4,
-              borderRadius: 1,
-            }} />
-            <span style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: 'var(--text-secondary)',
-              letterSpacing: 1,
-              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 20,
             }}>
-              {sectionLabel}
-            </span>
-          </div>
-        )}
+              <span style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: 'var(--accent)',
+                letterSpacing: 1.2,
+                textTransform: 'uppercase',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {String(sectionNumber).padStart(2, '0')}
+              </span>
+              <div style={{
+                width: 24,
+                height: 1.5,
+                background: 'var(--accent)',
+                opacity: 0.4,
+                borderRadius: 1,
+              }} />
+              <span style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                letterSpacing: 1,
+                textTransform: 'uppercase',
+              }}>
+                {sectionLabel}
+              </span>
+            </div>
+          )}
 
-        {/* Title */}
-        {title && (
-          <h1 style={{
-            fontSize: 42,
-            fontWeight: 800,
-            color: 'var(--page-nav-text)',
-            letterSpacing: '-1.2px',
-            lineHeight: 1.1,
-            margin: 0,
-            marginBottom: subtitle ? 12 : 32,
-          }}>
-            {title}
-          </h1>
-        )}
+          {/* Title */}
+          {title && (
+            <h1 style={{
+              fontSize: 42,
+              fontWeight: 800,
+              color: 'var(--page-nav-text)',
+              letterSpacing: '-1.2px',
+              lineHeight: 1.1,
+              margin: 0,
+              marginBottom: subtitle ? 12 : 32,
+            }}>
+              {title}
+            </h1>
+          )}
 
-        {/* Subtitle */}
-        {subtitle && (
-          <p style={{
-            fontSize: 18,
-            fontWeight: 400,
-            color: 'var(--text-secondary)',
-            lineHeight: 1.55,
-            margin: 0,
-            marginBottom: 40,
-            maxWidth: 720,
-          }}>
-            {subtitle}
-          </p>
-        )}
+          {/* Subtitle */}
+          {subtitle && (
+            <p style={{
+              fontSize: 18,
+              fontWeight: 400,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.55,
+              margin: 0,
+              marginBottom: 40,
+              maxWidth: 720,
+            }}>
+              {subtitle}
+            </p>
+          )}
+        </div>
 
         {/* Content */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
