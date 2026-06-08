@@ -30,7 +30,7 @@ const STAGES = [
 export default function GtmStagedSlide() {
   return (
     <SlideLayout
-      sectionNumber={6}
+      sectionNumber={7}
       sectionLabel="Go-to-Market"
       title="Design-Partner Stages"
       subtitle="A phased approach to validate demand with real revenue before committing to full build."
@@ -46,21 +46,8 @@ export default function GtmStagedSlide() {
               background: 'var(--surface)',
               borderRadius: 14,
               border: isCurrent ? '2px solid var(--accent)' : '1px solid var(--border)',
-              opacity: s.status === 'future' ? 0.7 : 1,
               position: 'relative',
             }}>
-              {/* Connector line between steps */}
-              {i !== STAGES.length - 1 && (
-                <div style={{
-                  position: 'absolute',
-                  left: 43,
-                  top: 64,
-                  bottom: -16,
-                  width: 2,
-                  background: isCurrent ? 'var(--accent)' : 'var(--border)',
-                  zIndex: 0,
-                }} />
-              )}
 
               <div style={{
                 width: 40,
@@ -101,7 +88,7 @@ export default function GtmStagedSlide() {
                   borderRadius: 8,
                 }}>
                   <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--page-nav-text)', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>Gate:</span>
-                  <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4, fontWeight: 500 }}>{s.gate}</span>
+                  <span style={{ fontSize: 13, color: 'var(--page-nav-text)', lineHeight: 1.4, fontWeight: 600 }}>{s.gate}</span>
                 </div>
               </div>
             </div>
@@ -109,7 +96,7 @@ export default function GtmStagedSlide() {
         })}
       </div>
 
-      <Callout>Over-fitting risk: run 3–5 pilots in parallel — features average out to product-level, not custom to one client.</Callout>
+      <Callout>Over-fitting risk: run 2-3 pilots in parallel — features average out to product-level, not custom to one client.</Callout>
     </SlideLayout>
   )
 }

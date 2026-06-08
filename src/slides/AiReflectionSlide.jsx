@@ -1,4 +1,4 @@
-import SlideLayout, { DataTable, Tag } from './SlideLayout'
+import SlideLayout, { DataTable } from './SlideLayout'
 
 const COLUMNS = [
   { label: 'Tool', align: 'left' },
@@ -13,9 +13,14 @@ const ROWS = [
     'Problem selection, "correction layer not module redesign" framing, AI-where-not calls.',
   ],
   [
-    { value: 'NotebookLM', bold: true, color: 'var(--page-nav-text)' },
+    { value: 'Perplexity', bold: true, color: 'var(--page-nav-text)' },
     'Competitive synthesis across 48 sources. Cross-referencing vendor claims against primary data.',
     'Phase 1/Phase 2 scope boundary. Design-partner model over horizontal build recommendation.',
+  ],
+  [
+    { value: 'Google Antigravity', bold: true, color: 'var(--page-nav-text)' },
+    'Build prototype and presentation.',
+    'Presentation narrative and design decisions.',
   ],
 ]
 
@@ -37,7 +42,7 @@ const MINE = [
 export default function AiReflectionSlide() {
   return (
     <SlideLayout
-      sectionNumber={16}
+      sectionNumber={17}
       sectionLabel="Reflection & Roadmap"
       title="AI Workflow Reflection"
       subtitle="What AI helped with, what it got wrong, and what stayed entirely mine."

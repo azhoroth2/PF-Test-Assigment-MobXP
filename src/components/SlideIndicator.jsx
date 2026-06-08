@@ -15,6 +15,8 @@ export default function SlideIndicator() {
         border: '1px solid var(--page-indicator-border)',
         borderRadius: 12,
         padding: '5px 8px',
+        maxWidth: '100%',
+        overflowX: 'auto',
       }}
     >
       {slides.map((slide, idx) => {
@@ -33,8 +35,7 @@ export default function SlideIndicator() {
               alignItems: 'center',
               justifyContent: 'center',
               height: 28,
-              minWidth: isActive ? 88 : 28,
-              padding: isActive ? '0 12px' : '0',
+              padding: '0 12px',
               borderRadius: 7,
               border: 'none',
               background: isActive ? 'var(--accent)' : 'transparent',
@@ -57,20 +58,24 @@ export default function SlideIndicator() {
             {isActive ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{
-                  width: 6, height: 6, borderRadius: '50%',
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
                   background: 'rgba(255,255,255,0.7)',
                   flexShrink: 0,
                 }} />
                 {slide.label}
               </span>
             ) : (
-              <span style={{
-                display: 'block',
-                width: 10,
-                height: 10,
-                borderRadius: 3,
-                background: 'var(--page-indicator-dot)',
-              }} />
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: 'var(--page-indicator-dot)',
+                  flexShrink: 0,
+                }} />
+              </span>
             )}
           </button>
         )

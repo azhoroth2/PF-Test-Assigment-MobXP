@@ -94,6 +94,7 @@ body {
   background: var(--page-bg);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 button {

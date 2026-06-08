@@ -206,7 +206,6 @@ export default function CompetitiveGlobalSlide() {
         </div>
       </div>
 
-      <Callout>"Global players have the features. They don't have the moats."</Callout>
     </SlideLayout>
   )
 }

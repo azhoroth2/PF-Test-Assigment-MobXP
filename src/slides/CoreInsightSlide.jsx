@@ -30,7 +30,7 @@ const HYPOTHESES = [
 export default function CoreInsightSlide() {
   return (
     <SlideLayout
-      sectionNumber={10}
+      sectionNumber={11}
       sectionLabel="Key Hypotheses"
       title="Key Hypotheses"
       subtitle="Three core hypotheses that must be true for this product to succeed, with explicit confirmation thresholds."

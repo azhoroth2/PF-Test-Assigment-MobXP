@@ -55,7 +55,7 @@ const PERSONAS = [
 export default function TwoUsersSlide() {
   return (
     <SlideLayout
-      sectionNumber={7}
+      sectionNumber={8}
       sectionLabel="Personas"
       title="All Users — Who, When, Why"
       subtitle="7 distinct personas across the ecosystem, evaluated for stage fit and primary pain."

@@ -1,17 +1,6 @@
 import SlideLayout from './SlideLayout'
 
 export default function CoverSlide() {
-  const sections = [
-    { num: '01–02', label: 'Market & Opportunity' },
-    { num: '03–04', label: 'Competitive Landscape' },
-    { num: '05–06', label: 'Go-to-Market' },
-    { num: '07–08', label: 'Problem Selection' },
-    { num: '09–11', label: 'Solution Design' },
-    { num: '12–13', label: 'Flow & Prototype' },
-    { num: '14–15', label: 'AI & Validation' },
-    { num: '16–17', label: 'Reflection & Roadmap' },
-  ]
-
   return (
     <SlideLayout verticalCenter>
       <div style={{
@@ -41,7 +30,6 @@ export default function CoverSlide() {
           <div style={{ width: 32, height: 1.5, background: 'var(--accent)', opacity: 0.5 }} />
         </div>
 
-        {/* Title */}
         <h1 style={{
           fontSize: 64,
           fontWeight: 800,
@@ -50,8 +38,10 @@ export default function CoverSlide() {
           lineHeight: 1.1,
           margin: 0,
           marginBottom: 24,
+          textAlign: 'center',
+          maxWidth: 900,
         }}>
-          Attendance Correction Layer
+          Blue colar segment solution exploration
         </h1>
 
 
@@ -72,46 +62,47 @@ export default function CoverSlide() {
           </span>
         </div>
 
-        {/* Section navigation */}
+        {/* Navigation Note */}
         <div style={{
           display: 'flex',
-          flexWrap: 'wrap',
+          alignItems: 'center',
           gap: 8,
-          justifyContent: 'center',
-          maxWidth: 720,
+          padding: '8px 16px',
+          background: 'rgba(127,150,178,0.08)',
+          borderRadius: 20,
+          border: '1px solid var(--border)',
+          marginTop: 16
         }}>
-          {sections.map((s) => (
-            <div
-              key={s.num}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '8px 14px',
-                borderRadius: 8,
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <span style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: 'var(--accent)',
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: 0.5,
-              }}>
-                {s.num}
-              </span>
-              <span style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: 'var(--text-secondary)',
-              }}>
-                {s.label}
-              </span>
-            </div>
-          ))}
+          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
+            Use
+          </span>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <kbd style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+              padding: '2px 6px',
+              fontSize: 12,
+              color: 'var(--page-nav-text)',
+              fontFamily: 'inherit',
+              boxShadow: '0 1px 1px rgba(0,0,0,0.05)'
+            }}>←</kbd>
+            <kbd style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 4,
+              padding: '2px 6px',
+              fontSize: 12,
+              color: 'var(--page-nav-text)',
+              fontFamily: 'inherit',
+              boxShadow: '0 1px 1px rgba(0,0,0,0.05)'
+            }}>→</kbd>
+          </div>
+          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
+            keys to navigate
+          </span>
         </div>
+
       </div>
     </SlideLayout>
   )

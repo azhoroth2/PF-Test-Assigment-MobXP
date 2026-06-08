@@ -17,7 +17,7 @@ const DOES_NOT = [
 export default function SolutionArchSlide() {
   return (
     <SlideLayout
-      sectionNumber={12}
+      sectionNumber={13}
       sectionLabel="Solution Design"
       title="Solution"
       subtitle="Where the correction layer sits in PF's existing stack — and what it explicitly does not touch."

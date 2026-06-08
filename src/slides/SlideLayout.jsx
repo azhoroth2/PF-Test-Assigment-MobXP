@@ -27,7 +27,13 @@ export default function SlideLayout({
         flex: verticalCenter ? undefined : 1,
       }}>
         {/* Header Block with conditional padding for fullBleed */}
-        <div style={{ padding: fullBleed ? '0 64px' : 0 }}>
+        <div style={{ 
+          padding: fullBleed ? '0 64px' : 0,
+          width: '100%',
+          maxWidth: fullBleed ? 1160 : 'none',
+          margin: fullBleed ? '0 auto' : 0,
+          boxSizing: 'border-box'
+        }}>
           {/* Section label */}
           {sectionNumber && (
             <div style={{
@@ -161,7 +167,7 @@ export default function SlideLayout({
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                           <div>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
                               Assumption
                             </p>
                             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
@@ -169,7 +175,7 @@ export default function SlideLayout({
                             </p>
                           </div>
                           <div>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
                               Test method
                             </p>
                             <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
@@ -177,7 +183,7 @@ export default function SlideLayout({
                             </p>
                           </div>
                           <div>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: h.critical ? '#ef4444' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: h.critical ? '#ef4444' : 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, marginTop: 0 }}>
                               If disconfirmed
                             </p>
                             <p style={{ fontSize: 12, color: h.critical ? '#ef4444' : 'var(--text-secondary)', lineHeight: 1.4, margin: 0, fontWeight: h.critical ? 600 : 400 }}>
@@ -370,7 +376,7 @@ export function FlowBox({ children, isNew, isExisting, isMissing }) {
   )
 }
 
-export function Callout({ children, icon = '→' }) {
+export function Callout({ children }) {
   return (
     <div style={{
       padding: '16px 20px',

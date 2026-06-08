@@ -1,4 +1,4 @@
-import SlideLayout, { Tag, Callout } from './SlideLayout'
+import SlideLayout, { Tag } from './SlideLayout'
 
 const REJECTIONS = [
   {
@@ -33,7 +33,7 @@ const WINS = [
 export default function ProblemSelectionSlide() {
   return (
     <SlideLayout
-      sectionNumber={9}
+      sectionNumber={10}
       sectionLabel="Problem Selection"
       title="Why This, Not That"
       subtitle="Explicit rejections — then why attendance correction is the right problem."

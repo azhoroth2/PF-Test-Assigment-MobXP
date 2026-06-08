@@ -37,7 +37,7 @@ const NO_ITEMS = [
 export default function AiArchitectureSlide() {
   return (
     <SlideLayout
-      sectionNumber={14}
+      sectionNumber={15}
       sectionLabel="AI & Validation"
       title="AI Architecture — Where Yes, Where No"
       subtitle="AI has a specific, bounded role. Every boundary is a design decision, not a limitation."

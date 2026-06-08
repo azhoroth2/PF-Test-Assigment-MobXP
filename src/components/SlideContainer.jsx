@@ -69,34 +69,39 @@ export default function SlideContainer() {
 
     // Step 1: exit current slide
     setAnimState('exit')
+    
     const t1 = setTimeout(() => {
-      // Step 2: swap content and enter
+      // Step 2: swap content and jump to 'enter' state (no transition)
       setDisplayedSlide(pendingSlide.current)
       setAnimState('enter')
-      const t2 = setTimeout(() => {
-        setAnimState('idle')
-      }, 320)
-      return () => clearTimeout(t2)
-    }, 220)
+      
+      // Step 3: next frame, go to 'idle' (transition on)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setAnimState('idle')
+        })
+      })
+    }, 250)
 
     return () => clearTimeout(t1)
   }, [currentSlide]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const SlideComponent = slides[displayedSlide]?.component
+  const isPrototypeSlide = slides[displayedSlide]?.id === 'prototype'
   const isForward = pendingDirection.current === 'forward'
 
-  const exitTransform = isForward ? 'translateX(-48px)' : 'translateX(48px)'
-  const enterTransform = isForward ? 'translateX(48px)' : 'translateX(-48px)'
+  const exitTransform = isForward ? 'translateX(-30px)' : 'translateX(30px)'
+  const enterTransform = isForward ? 'translateX(30px)' : 'translateX(-30px)'
 
   const slideStyle = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-    transition: animState !== 'idle'
-      ? 'opacity 220ms cubic-bezier(0.25,1,0.5,1), transform 280ms cubic-bezier(0.25,1,0.5,1)'
-      : 'none',
-    opacity: animState === 'exit' ? 0 : animState === 'enter' ? 0 : 1,
+    transition: animState === 'enter'
+      ? 'none'
+      : 'opacity 350ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+    opacity: animState === 'idle' ? 1 : 0,
     transform: animState === 'exit'
       ? exitTransform
       : animState === 'enter'
@@ -106,21 +111,25 @@ export default function SlideContainer() {
 
   return (
     <>
-      <ArrowButton
-        direction="left"
-        onClick={goPrev}
-        disabled={currentSlide === 0}
-      />
+      {!isPrototypeSlide && (
+        <ArrowButton
+          direction="left"
+          onClick={goPrev}
+          disabled={currentSlide === 0}
+        />
+      )}
 
       <div style={slideStyle}>
         {SlideComponent && <SlideComponent />}
       </div>
 
-      <ArrowButton
-        direction="right"
-        onClick={goNext}
-        disabled={currentSlide === slides.length - 1}
-      />
+      {!isPrototypeSlide && (
+        <ArrowButton
+          direction="right"
+          onClick={goNext}
+          disabled={currentSlide === slides.length - 1}
+        />
+      )}
     </>
   )
 }

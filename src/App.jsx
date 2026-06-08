@@ -8,9 +8,11 @@ import SlideContainer from './components/SlideContainer'
 
 // ─── Slide imports ────────────────────────────────────────────────────────────
 import CoverSlide from './slides/CoverSlide'
+import AgendaSlide from './slides/AgendaSlide'
 import MarketRealitySlide from './slides/MarketRealitySlide'
 import CompetitiveGlobalSlide from './slides/CompetitiveGlobalSlide'
 import CompetitiveLocalSlide from './slides/CompetitiveLocalSlide'
+import VerdictSlide from './slides/VerdictSlide'
 import GtmOptionsSlide from './slides/GtmOptionsSlide'
 import GtmStagedSlide from './slides/GtmStagedSlide'
 import PainMatrixSlide from './slides/PainMatrixSlide'
@@ -73,23 +75,25 @@ function ThemeToggle({ dark, onToggle }) {
 
 // ─── Slide registry ───────────────────────────────────────────────────────────
 const SLIDES = [
-  { id: 'cover',              label: 'Cover',            component: CoverSlide },
-  { id: 'market',             label: 'Market',           component: MarketRealitySlide },
-  { id: 'comp-global',        label: 'Global',           component: CompetitiveGlobalSlide },
-  { id: 'comp-local',         label: 'Local',            component: CompetitiveLocalSlide },
-  { id: 'gtm-options',        label: 'GTM Options',      component: GtmOptionsSlide },
-  { id: 'gtm-staged',         label: 'GTM Stages',       component: GtmStagedSlide },
-  { id: 'two-users',          label: 'Personas',         component: TwoUsersSlide },
+  { id: 'cover',              label: 'Blue colar segment solution exploration', component: CoverSlide },
+  { id: 'agenda',             label: 'Agenda',           component: AgendaSlide },
+  { id: 'market',             label: 'Market Reality',   component: MarketRealitySlide },
+  { id: 'comp-global',        label: 'Global Players',   component: CompetitiveGlobalSlide },
+  { id: 'comp-local',         label: 'Local Incumbents', component: CompetitiveLocalSlide },
+  { id: 'verdict',            label: 'Should PF Enter Blue-Collar?', component: VerdictSlide },
+  { id: 'gtm-options',        label: 'Three Options',      component: GtmOptionsSlide },
+  { id: 'gtm-staged',         label: 'Design-Partner Stages',       component: GtmStagedSlide },
+  { id: 'two-users',          label: 'All Users — Who, When, Why',         component: TwoUsersSlide },
   { id: 'pain-matrix',        label: 'Pain Matrix',      component: PainMatrixSlide },
-  { id: 'problem-selection',  label: 'Selection',        component: ProblemSelectionSlide },
+  { id: 'problem-selection',  label: 'Why This, Not That',        component: ProblemSelectionSlide },
   { id: 'core-insight',       label: 'Key Hypotheses',   component: CoreInsightSlide },
-  { id: 'flow-blockers',      label: 'Blockers',         component: FlowBlockersSlide },
+  { id: 'flow-blockers',      label: 'Flowchart',         component: FlowBlockersSlide },
   { id: 'solution-arch',      label: 'Solution',         component: SolutionArchSlide },
-  { id: 'prototype',          label: 'Prototype',        component: PrototypeSlide },
-  { id: 'ai-arch',            label: 'AI',               component: AiArchitectureSlide },
-  { id: 'validation',         label: 'Validation',       component: ValidationPlanSlide },
-  { id: 'ai-reflection',      label: 'Reflection',       component: AiReflectionSlide },
-  { id: 'roadmap',            label: 'Roadmap',          component: RoadmapSlide },
+  { id: 'prototype',          label: 'Correction Flow Prototype',        component: PrototypeSlide },
+  { id: 'ai-arch',            label: 'AI Architecture — Where Yes, Where No',               component: AiArchitectureSlide },
+  { id: 'validation',         label: 'Validation Plan',       component: ValidationPlanSlide },
+  { id: 'ai-reflection',      label: 'AI Workflow Reflection',       component: AiReflectionSlide },
+  { id: 'roadmap',            label: 'What\'s Next — Phase Roadmap',          component: RoadmapSlide },
 ]
 
 // ─── App ──────────────────────────────────────────────────────────────────────
@@ -116,7 +120,7 @@ export default function App() {
               background: 'var(--page-nav-bg)',
               borderBottom: '1px solid var(--page-nav-border)',
               display: 'grid',
-              gridTemplateColumns: '1fr auto 1fr',
+              gridTemplateColumns: '1fr minmax(0, auto) 1fr',
               alignItems: 'center',
               padding: '0 24px',
               flexShrink: 0,
@@ -133,7 +137,7 @@ export default function App() {
                 textTransform: 'uppercase',
                 opacity: 0.5,
               }}>
-                PeopleForce · MobXP
+                Test-Assignment - Stanislav Stefaniuk
               </span>
 
               {/* Center — slide indicator */}
@@ -146,7 +150,7 @@ export default function App() {
             </div>
 
             {/* ── Slide content ── */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' }}>
               <SlideContainer />
             </div>
 

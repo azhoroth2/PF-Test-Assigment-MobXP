@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { Routes, Route, useLocation, useMatch, useSearchParams } from 'react-router-dom'
 import { Tag } from './SlideLayout'
 
-function ValidationCard({ id, risk, question, assumption, test, ifFails }) {
+function ValidationCard({ risk, question, assumption, test }) {
   const riskColor = risk === 'High' ? '#f59e0b' : 'var(--text-secondary)'
   const riskBg = risk === 'High' ? 'rgba(245,158,11,0.04)' : 'transparent'
   

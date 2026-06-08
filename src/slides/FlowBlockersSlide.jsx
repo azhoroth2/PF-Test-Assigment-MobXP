@@ -16,7 +16,7 @@ export default function FlowBlockersSlide() {
 
   return (
     <SlideLayout
-      sectionNumber={11}
+      sectionNumber={12}
       sectionLabel="Flow & Prototype"
       title="Flowchart"
       subtitle="Interactive flow diagram showing how attendance data travels from factory floor to payroll."

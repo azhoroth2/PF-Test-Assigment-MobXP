@@ -11,34 +11,34 @@ const PHASES = [
   },
   {
     num: 2,
-    title: 'Worker Mobile App',
-    timeline: 'Design-partner phase',
-    desc: 'Multilingual worker mobile app + SMS-OTP login (no company email required). Workers see their own attendance, dispute corrections, submit leave.',
+    title: 'In-depth Validation',
+    timeline: 'Next step',
+    desc: 'In-depth validation + consulting with GTM and CSM representatives.',
     status: 'next',
-    items: ['SMS-OTP onboarding (no company email)', 'Worker attendance view', 'Correction dispute flow', 'Multilingual (PL + UA + EN)'],
+    items: ['Validation with GTM', 'Consulting with CSM', 'Iterate feedback'],
   },
   {
     num: 3,
-    title: 'Permit & Legality Tracking',
-    timeline: 'After Phase 2 validated',
-    desc: 'Permit/legality tracking module — unlocks staffing agency channel. Work permits, contracts, document expiry alerts.',
+    title: 'Worker Mobile App',
+    timeline: 'Design-partner phase',
+    desc: 'Multilingual worker mobile app + SMS-OTP login (no company email required). Workers see their own attendance, dispute corrections, submit leave.',
     status: 'future',
-    items: ['Work permit tracking', 'Contract type management', 'Document expiry alerts', 'Staffing agency integration'],
+    items: ['SMS-OTP onboarding (no company email)', 'Worker attendance view', 'Correction dispute flow', 'Multilingual (PL + UA + EN)'],
   },
   {
     num: 4,
-    title: 'Czech Expansion',
-    timeline: 'After Polish ARR proven',
-    desc: 'Czech market entry — only after Polish ARR proven + Czech payroll integration feasible within budget.',
+    title: 'CEE Expansion',
+    timeline: 'Future phase',
+    desc: 'CEE market entry — CEE payroll integration feasible within budget.',
     status: 'future',
-    items: ['Czech payroll integration (assessment)', 'Czech labor law compliance', 'Czech language support', 'Cross-market reporting'],
+    items: ['CEE payroll integration (assessment)', 'CEE labor law compliance', 'CEE language support', 'Cross-market reporting'],
   },
 ]
 
 export default function RoadmapSlide() {
   return (
     <SlideLayout
-      sectionNumber={17}
+      sectionNumber={18}
       sectionLabel="Reflection & Roadmap"
       title="What's Next — Phase Roadmap"
       subtitle="Each phase is gated. No phase begins without the previous one proving revenue."
@@ -72,7 +72,6 @@ export default function RoadmapSlide() {
                 borderRadius: 14,
                 border: `${isCurrent ? '2px' : '1px'} solid ${borderColor}`,
                 background: bg,
-                opacity: phase.status === 'future' ? 0.6 : 1,
               }}>
                 <div style={{
                   display: 'flex',
@@ -137,9 +136,9 @@ export default function RoadmapSlide() {
                   {phase.items.map((item) => (
                     <span key={item} style={{
                       padding: '4px 10px',
-                      fontSize: 11,
-                      fontWeight: 500,
-                      color: 'var(--text-secondary)',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: 'var(--page-nav-text)',
                       background: 'var(--surface)',
                       border: '1px solid var(--border)',
                       borderRadius: 6,
@@ -153,8 +152,6 @@ export default function RoadmapSlide() {
           )
         })}
       </div>
-
-      <Callout>"The moat gets harder to cross with each phase completed."</Callout>
     </SlideLayout>
   )
 }

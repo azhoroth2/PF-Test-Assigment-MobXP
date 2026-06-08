@@ -1,4 +1,4 @@
-import SlideLayout, { DataTable, Tag } from './SlideLayout'
+import SlideLayout, { DataTable } from './SlideLayout'
 
 const COLUMNS = [
   { label: 'Dimension', align: 'left' },
@@ -58,7 +58,7 @@ export default function GtmOptionsSlide() {
 
   return (
     <SlideLayout
-      sectionNumber={5}
+      sectionNumber={6}
       sectionLabel="Go-to-Market"
       title="Three Options"
       subtitle="Design-partner model wins: moats are already funded, feature gap is finite, validates demand on real revenue before major capex."

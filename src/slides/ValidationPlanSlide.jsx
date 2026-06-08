@@ -72,7 +72,7 @@ const HYPOTHESES = [
 export default function ValidationPlanSlide() {
   return (
     <SlideLayout
-      sectionNumber={15}
+      sectionNumber={16}
       sectionLabel="AI & Validation"
       title="Validation Plan"
       subtitle="8 hypotheses in de-risk priority order. V1 and V4 are existential — if they fail, the problem or AI feature is wrong."
