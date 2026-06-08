@@ -1,21 +1,39 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import './tokens.css'
-import ShiftSummary from './screens/ShiftSummary'
-import CorrectionFlow from './screens/CorrectionFlow'
-import PerWorkerCard from './screens/PerWorkerCard'
-import Confirmation from './screens/Confirmation'
-import Flowchart from './components/Flowchart'
-import HrRequest from './screens/HrRequest'
+import { AnnotationProvider } from './contexts/AnnotationContext'
+import { PresentationProvider } from './contexts/PresentationContext'
+import SlideIndicator from './components/SlideIndicator'
+import SlideContainer from './components/SlideContainer'
 
-const PHONE_W = 390
-const PHONE_H = 844
+// ─── Slide imports ────────────────────────────────────────────────────────────
+import CoverSlide from './slides/CoverSlide'
+import AgendaSlide from './slides/AgendaSlide'
+import MarketRealitySlide from './slides/MarketRealitySlide'
+import CompetitiveGlobalSlide from './slides/CompetitiveGlobalSlide'
+import CompetitiveLocalSlide from './slides/CompetitiveLocalSlide'
+import VerdictSlide from './slides/VerdictSlide'
+import GtmOptionsSlide from './slides/GtmOptionsSlide'
+import GtmStagedSlide from './slides/GtmStagedSlide'
+import PainMatrixSlide from './slides/PainMatrixSlide'
+import ProblemSelectionSlide from './slides/ProblemSelectionSlide'
+import CoreInsightSlide from './slides/CoreInsightSlide'
+import TwoUsersSlide from './slides/TwoUsersSlide'
+import SolutionArchSlide from './slides/SolutionArchSlide'
+import FlowBlockersSlide from './slides/FlowBlockersSlide'
+import PrototypeSlide from './slides/PrototypeSlide'
+import AiArchitectureSlide from './slides/AiArchitectureSlide'
+import ValidationPlanSlide from './slides/ValidationPlanSlide'
+import AiReflectionSlide from './slides/AiReflectionSlide'
+import RoadmapSlide from './slides/RoadmapSlide'
 
+// ─── Theme toggle ─────────────────────────────────────────────────────────────
 function ThemeToggle({ dark, onToggle }) {
   return (
     <button
       onClick={onToggle}
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      id="theme-toggle"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -24,6 +42,7 @@ function ThemeToggle({ dark, onToggle }) {
         border: 'none',
         cursor: 'pointer',
         padding: '4px 0',
+        flexShrink: 0,
       }}
     >
       <span style={{ fontSize: 13, color: 'var(--text-muted)', userSelect: 'none' }}>
@@ -54,6 +73,30 @@ function ThemeToggle({ dark, onToggle }) {
   )
 }
 
+// ─── Slide registry ───────────────────────────────────────────────────────────
+const SLIDES = [
+  { id: 'cover',              label: 'Blue colar segment solution exploration', component: CoverSlide },
+  { id: 'agenda',             label: 'Agenda',           component: AgendaSlide },
+  { id: 'market',             label: 'Market Reality',   component: MarketRealitySlide },
+  { id: 'comp-global',        label: 'Global Players',   component: CompetitiveGlobalSlide },
+  { id: 'comp-local',         label: 'Local Incumbents', component: CompetitiveLocalSlide },
+  { id: 'verdict',            label: 'Should PF Enter Blue-Collar?', component: VerdictSlide },
+  { id: 'gtm-options',        label: 'Three Options',      component: GtmOptionsSlide },
+  { id: 'gtm-staged',         label: 'Design-Partner Stages',       component: GtmStagedSlide },
+  { id: 'two-users',          label: 'All Users — Who, When, Why',         component: TwoUsersSlide },
+  { id: 'pain-matrix',        label: 'Pain Matrix',      component: PainMatrixSlide },
+  { id: 'problem-selection',  label: 'Why This, Not That',        component: ProblemSelectionSlide },
+  { id: 'core-insight',       label: 'Key Hypotheses',   component: CoreInsightSlide },
+  { id: 'flow-blockers',      label: 'Flowchart',         component: FlowBlockersSlide },
+  { id: 'solution-arch',      label: 'Solution',         component: SolutionArchSlide },
+  { id: 'prototype',          label: 'Correction Flow Prototype',        component: PrototypeSlide },
+  { id: 'ai-arch',            label: 'AI Architecture — Where Yes, Where No',               component: AiArchitectureSlide },
+  { id: 'validation',         label: 'Validation Plan',       component: ValidationPlanSlide },
+  { id: 'ai-reflection',      label: 'AI Workflow Reflection',       component: AiReflectionSlide },
+  { id: 'roadmap',            label: 'What\'s Next — Phase Roadmap',          component: RoadmapSlide },
+]
+
+// ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [dark, setDark] = useState(false)
 
@@ -66,108 +109,54 @@ export default function App() {
   }, [dark])
 
   return (
-    <BrowserRouter>
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--page-bg)' }}>
-        {/* Webpage nav bar */}
-        <div style={{
-          height: 52,
-          background: 'var(--page-nav-bg)',
-          borderBottom: '1px solid var(--page-nav-border)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 32px',
-          flexShrink: 0,
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--page-nav-text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>
-            Foreman Prototype
-          </span>
-          <ThemeToggle dark={dark} onToggle={() => setDark((d) => !d)} />
-        </div>
+    <AnnotationProvider>
+      <BrowserRouter>
+        <PresentationProvider slides={SLIDES}>
+          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--page-bg)' }}>
 
-        {/* Main content */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'stretch' }}>
-          {/* Flowchart — sticky sidebar */}
-          <div style={{
-            position: 'sticky',
-            top: 52,
-            height: 'calc(100vh - 52px)',
-            overflowY: 'auto',
-            padding: '32px 16px 32px 32px',
-            flexShrink: 0,
-            background: 'var(--page-sidebar-bg)',
-            borderRight: '1px solid var(--page-sidebar-border)',
-          }}>
-            <Flowchart />
-          </div>
-
-          {/* Phone area */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'stretch' }}>
+            {/* ── Top nav bar ── */}
             <div style={{
-              flex: 1,
-              margin: '32px',
-              borderRadius: 16,
-              background: 'var(--page-phone-area-bg)',
-              display: 'flex',
-              justifyContent: 'center',
+              height: 52,
+              background: 'var(--page-nav-bg)',
+              borderBottom: '1px solid var(--page-nav-border)',
+              display: 'grid',
+              gridTemplateColumns: '1fr minmax(0, auto) 1fr',
               alignItems: 'center',
+              padding: '0 24px',
+              flexShrink: 0,
+              position: 'sticky',
+              top: 0,
+              zIndex: 100,
             }}>
-              <div style={{
-                width: PHONE_W,
-                height: PHONE_H,
-                maxWidth: '100%',
-                background: 'var(--bg)',
-                borderRadius: 40,
-                overflow: 'hidden',
-                boxShadow: dark
-                  ? '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)'
-                  : '0 20px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)',
-                display: 'flex',
-                flexDirection: 'column',
-                flexShrink: 0,
+              {/* Left — branding */}
+              <span style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'var(--page-nav-text)',
+                letterSpacing: 0.5,
+                textTransform: 'uppercase',
+                opacity: 0.5,
               }}>
-                {/* Status bar */}
-                <div style={{
-                  height: 44,
-                  background: 'var(--bg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0 24px',
-                  flexShrink: 0,
-                  borderBottom: '1px solid var(--border)',
-                }}>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>9:41</span>
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: 'var(--text-primary)' }}>●●● WiFi 🔋</span>
-                  </div>
-                </div>
+                Test-Assignment - Stanislav Stefaniuk
+              </span>
 
-                {/* Scrollable screen area */}
-                <div style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflowY: 'auto',
-                  position: 'relative',
-                  background: 'var(--bg)',
-                }}>
-                  <Routes>
-                    <Route path="/" element={<ShiftSummary />} />
-                    <Route path="/corrections" element={<CorrectionFlow />} />
-                    <Route path="/correction/:workerId" element={<PerWorkerCard />} />
-                    <Route path="/confirm" element={<Confirmation />} />
-                    <Route path="/hr-request" element={<HrRequest />} />
-                  </Routes>
-                </div>
+              {/* Center — slide indicator */}
+              <SlideIndicator />
+
+              {/* Right — theme toggle */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ThemeToggle dark={dark} onToggle={() => setDark((d) => !d)} />
               </div>
             </div>
+
+            {/* ── Slide content ── */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' }}>
+              <SlideContainer />
+            </div>
+
           </div>
-        </div>
-      </div>
-    </BrowserRouter>
+        </PresentationProvider>
+      </BrowserRouter>
+    </AnnotationProvider>
   )
 }

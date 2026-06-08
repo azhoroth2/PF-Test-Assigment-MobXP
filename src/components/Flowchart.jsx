@@ -4,7 +4,7 @@ import { workers } from '../data/workers'
 const EDGE_DEMOS = ['full-conflict', 'loading']
 const naturalState = (w) => w.confidence >= 85 ? 'high-confidence' : w.conflict ? 'conflict' : 'low-confidence'
 
-const NODES = [
+export const NODES = [
   {
     id: 'shift',
     label: 'Shift Summary',
@@ -21,7 +21,7 @@ const NODES = [
       {
         label: 'Edge cases',
         items: [
-          { label: 'Offline', desc: 'A1 · banner', path: '/', search: 'demo=offline', active: (p, q) => p === '/' && q === 'offline' },
+          { label: 'Offline', desc: 'Banner', path: '/', search: 'demo=offline', active: (p, q) => p === '/' && q === 'offline' },
           { label: 'Multi-line', desc: 'Lines A & B', path: '/', search: 'demo=multi-line', active: (p, q) => p === '/' && q === 'multi-line' },
         ],
       },
@@ -36,7 +36,7 @@ const NODES = [
         label: null,
         items: [
           { label: 'Bulk approve', desc: '≥85% conf', path: '/corrections', search: 'demo=bulk', active: (p, q) => p === '/corrections' && (!q || q === 'bulk') },
-          { label: 'Undo approve', desc: 'D4 · tap Approve', path: '/corrections', search: 'demo=undo', active: (p, q) => p === '/corrections' && q === 'undo' },
+          { label: 'Undo approve', desc: 'Tap approve', path: '/corrections', search: 'demo=undo', active: (p, q) => p === '/corrections' && q === 'undo' },
         ],
       },
       {
@@ -80,7 +80,7 @@ const NODES = [
       {
         label: null,
         items: [
-          { label: 'Detail needed', desc: 'E3 · bounce-back', path: '/hr-request', search: '', active: (p) => p === '/hr-request' },
+          { label: 'Detail needed', desc: 'Bounce-back', path: '/hr-request', search: '', active: (p) => p === '/hr-request' },
         ],
       },
     ],
@@ -95,8 +95,8 @@ const NODES = [
         items: [
           { label: 'Success', desc: 'All submitted', path: '/confirm', search: '', active: (p, q) => p === '/confirm' && q !== 'partial' && q !== 'offline' && q !== 'partial-sync' },
           { label: 'Partial', desc: 'Some remain', path: '/confirm', search: 'demo=partial', active: (p, q) => p === '/confirm' && q === 'partial' },
-          { label: 'Offline saved', desc: 'A3 · queued', path: '/confirm', search: 'demo=offline', active: (p, q) => p === '/confirm' && q === 'offline' },
-          { label: 'Partial sync', desc: 'A5 · pending', path: '/confirm', search: 'demo=partial-sync', active: (p, q) => p === '/confirm' && q === 'partial-sync' },
+          { label: 'Offline saved', desc: 'Queued', path: '/confirm', search: 'demo=offline', active: (p, q) => p === '/confirm' && q === 'offline' },
+          { label: 'Partial sync', desc: 'Pending', path: '/confirm', search: 'demo=partial-sync', active: (p, q) => p === '/confirm' && q === 'partial-sync' },
         ],
       },
     ],
@@ -105,7 +105,7 @@ const NODES = [
 
 function HArrow() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', width: 28, flexShrink: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', width: 20, flexShrink: 0 }}>
       <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
       <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderLeft: '6px solid var(--border)' }} />
     </div>
@@ -141,21 +141,8 @@ export default function Flowchart() {
       flexDirection: 'column',
       alignItems: 'stretch',
       width: 580,
-      paddingTop: 56,
       flexShrink: 0,
     }}>
-      <p style={{
-        fontSize: 12,
-        fontWeight: 700,
-        letterSpacing: 1.4,
-        color: 'var(--text-secondary)',
-        textTransform: 'uppercase',
-        marginBottom: 24,
-        textAlign: 'center',
-      }}>
-        Flow
-      </p>
-
       {NODES.map((node, idx) => {
         const isActiveNode = node.match(currentPath)
         const isVisited = activeNodeIdx > idx
@@ -219,7 +206,7 @@ export default function Flowchart() {
                             onClick={() => goTo(item.path, item.search)}
                             title={`Go to ${item.label}`}
                             style={{
-                              width: 112,
+                              width: 120,
                               flexShrink: 0,
                               padding: '10px 8px',
                               background: isActiveSub ? 'rgba(0,185,80,0.06)' : 'var(--surface)',

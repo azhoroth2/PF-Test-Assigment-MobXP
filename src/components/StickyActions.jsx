@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function StickyActions({ primary, secondary }) {
+export default function StickyActions({ primary, secondary, 'data-annotation-id': annotationId }) {
   const [submitting, setSubmitting] = useState(false)
 
   async function handlePrimary() {
@@ -17,7 +17,7 @@ export default function StickyActions({ primary, secondary }) {
   const primaryDisabled = primary.disabled || submitting
 
   return (
-    <div style={{
+    <div data-annotation-id={annotationId} style={{
       position: 'sticky',
       bottom: 0,
       marginTop: 'auto',

@@ -22,6 +22,13 @@
   --page-nav-bg: #ffffff;
   --page-nav-border: #e8ecf0;
   --page-nav-text: #000f30;
+  /* Slide indicator */
+  --page-indicator-bg: #f0f2f5;
+  --page-indicator-border: #e0e4ea;
+  --page-indicator-dot: #b0bac6;
+  /* Arrow buttons */
+  --page-arrow-bg: rgba(0,0,0,0.06);
+  --page-arrow-hover-bg: rgba(0,0,0,0.11);
 }
 
 [data-theme="dark"] {
@@ -41,6 +48,13 @@
   --page-nav-bg: #0d1018;
   --page-nav-border: #1c2333;
   --page-nav-text: #eef2ff;
+  /* Slide indicator */
+  --page-indicator-bg: rgba(255,255,255,0.05);
+  --page-indicator-border: #1c2333;
+  --page-indicator-dot: #3d5066;
+  /* Arrow buttons */
+  --page-arrow-bg: rgba(255,255,255,0.07);
+  --page-arrow-hover-bg: rgba(255,255,255,0.13);
 }
 
 @keyframes screenEnter {
@@ -80,6 +94,7 @@ body {
   background: var(--page-bg);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 button {
