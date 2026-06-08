@@ -99,6 +99,13 @@ const SLIDES = [
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [dark, setDark] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     if (dark) {
@@ -107,6 +114,41 @@ export default function App() {
       delete document.documentElement.dataset.theme
     }
   }, [dark])
+
+  if (isMobile) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 32,
+        background: 'var(--page-bg)',
+        textAlign: 'center',
+      }}>
+        <span style={{ fontSize: 48, marginBottom: 24 }}>🖥️</span>
+        <h1 style={{
+          fontSize: 24,
+          fontWeight: 800,
+          color: 'var(--page-nav-text)',
+          marginBottom: 12,
+          letterSpacing: '-0.5px'
+        }}>
+          Please Use Desktop
+        </h1>
+        <p style={{
+          fontSize: 16,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.5,
+          maxWidth: 320,
+          margin: 0
+        }}>
+          For the best experience and to interact with the prototypes, please open this link on a desktop computer.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <AnnotationProvider>
